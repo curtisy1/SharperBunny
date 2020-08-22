@@ -1,9 +1,8 @@
 namespace SharperBunny.Tests.Consume {
   using System;
   using System.Collections.Generic;
-  using System.Text;
+  using System.Text.Json;
   using System.Threading.Tasks;
-  using Newtonsoft.Json;
   using SharperBunny.Configuration;
   using SharperBunny.Interfaces;
   using Xunit;
@@ -41,7 +40,7 @@ namespace SharperBunny.Tests.Consume {
 
     private void SetupAndPublish(IBunny bunny, string queueName = queue) {
       var msg = new ConsumeMessage();
-      var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
+      var bytes = JsonSerializer.SerializeToUtf8Bytes(msg);
 
       var channel = bunny.Channel(true);
       var prop = channel.CreateBasicProperties();
