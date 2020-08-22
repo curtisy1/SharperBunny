@@ -5,32 +5,32 @@ namespace SharperBunny.Connect {
   internal class ConnectionPipe : IConnectPipe {
     // private uint _retries;
     // private uint _retryPause;
-    private string _host;
-    private string _password;
-    private uint _port;
-    private string _user;
-    private string _vHost;
+    private string host;
+    private string password;
+    private uint port;
+    private string user;
+    private string vHost;
 
     public IConnectPipe AuthenticatePlain(string user = "guest", string password = "guest") {
-      this._user = user;
-      this._password = password;
+      this.user = user;
+      this.password = password;
       return this;
     }
 
     public IBunny Connect() {
-      if (string.IsNullOrWhiteSpace(this._user)) {
+      if (string.IsNullOrWhiteSpace(this.user)) {
         this.AuthenticatePlain();
       }
 
-      if (string.IsNullOrWhiteSpace(this._host)) {
-        this._host = "localhost";
+      if (string.IsNullOrWhiteSpace(this.host)) {
+        this.host = "localhost";
       }
 
-      if (string.IsNullOrWhiteSpace(this._vHost)) {
+      if (string.IsNullOrWhiteSpace(this.vHost)) {
         this.ToVirtualHost();
       }
 
-      if (this._port == 0) {
+      if (this.port == 0) {
         this.ToPort();
       }
 
@@ -38,27 +38,27 @@ namespace SharperBunny.Connect {
     }
 
     public IConnectPipe ToHost(string hostName = "localhost") {
-      this._host = hostName;
+      this.host = hostName;
       return this;
     }
 
     public IConnectPipe ToPort(uint port = 5672) {
-      this._port = port;
+      this.port = port;
       return this;
     }
 
     public IConnectPipe ToVirtualHost(string vHost = "/") {
       if (vHost == "/") {
-        this._vHost = "%2F";
+        this.vHost = "%2F";
       } else {
-        this._vHost = vHost;
+        this.vHost = vHost;
       }
 
       return this;
     }
 
     public string ToString(string format, IFormatProvider formatProvider) {
-      var result = $"amqp://{this._user}:{this._password}@{this._host}:{this._port}/{this._vHost}";
+      var result = $"amqp://{this.user}:{this.password}@{this.host}:{this.port}/{this.vHost}";
       return result;
     }
   }

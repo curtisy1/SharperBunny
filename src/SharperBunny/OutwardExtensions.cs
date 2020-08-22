@@ -112,7 +112,7 @@ namespace SharperBunny {
     /// <summary>
     ///   Define all incoming messages to this queue with a Time to live (Message expiry)
     /// </summary>
-    public static IQueue WithTTL(this IQueue queue, uint ttl) {
+    public static IQueue WithTtl(this IQueue queue, uint ttl) {
       return queue.AddTag("x-message-ttl", ttl);
     }
 

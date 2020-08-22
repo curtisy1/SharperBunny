@@ -7,41 +7,41 @@ namespace SharperBunny {
   using SharperBunny.Interfaces;
 
   public static class Bunny {
-      /// <summary>
-      ///   Default is 3
-      /// </summary>
-      public static uint RetryCount { get; set; } = 3;
+    /// <summary>
+    ///   Default is 3
+    /// </summary>
+    public static uint RetryCount { get; set; } = 3;
 
-      /// <summary>
-      ///   Default is 1500 ms
-      /// </summary>
-      public static uint RetryPauseInMS { get; set; } = 1500;
+    /// <summary>
+    ///   Default is 1500 ms
+    /// </summary>
+    public static uint RetryPauseInMs { get; set; } = 1500;
 
-      /// <summary>
-      ///   Create a permanent connection by using parameters.
-      /// </summary>
-      public static IBunny ConnectSingle(ConnectionParameters parameters) {
+    /// <summary>
+    ///   Create a permanent connection by using parameters.
+    /// </summary>
+    public static IBunny ConnectSingle(ConnectionParameters parameters) {
       return Connect(parameters);
     }
 
-      /// <summary>
-      ///   Create a permanent connection by using an amqp_uri.
-      /// </summary>
-      public static IBunny ConnectSingle(string amqpUri) {
-      return Connect(new AmqpTransport { AMQP = amqpUri });
+    /// <summary>
+    ///   Create a permanent connection by using an amqp_uri.
+    /// </summary>
+    public static IBunny ConnectSingle(string amqpUri) {
+      return Connect(new AmqpTransport { Amqp = amqpUri });
     }
 
-      /// <summary>
-      ///   Connect with fluent interface
-      /// </summary>
-      public static IConnectPipe ConnectSingleWith() {
+    /// <summary>
+    ///   Connect with fluent interface
+    /// </summary>
+    public static IConnectPipe ConnectSingleWith() {
       return new ConnectionPipe();
     }
 
-      /// <summary>
-      ///   Connect to a cluster with a builder interface
-      /// </summary>
-      public static IConnector ClusterConnect() {
+    /// <summary>
+    ///   Connect to a cluster with a builder interface
+    /// </summary>
+    public static IConnector ClusterConnect() {
       return new Cnnctr();
     }
 
@@ -56,7 +56,7 @@ namespace SharperBunny {
           return new Facade.Bunny(factory);
         } catch {
           count++;
-          Thread.Sleep((int)RetryPauseInMS);
+          Thread.Sleep((int)RetryPauseInMs);
         }
       }
 
@@ -64,10 +64,10 @@ namespace SharperBunny {
     }
 
     private class AmqpTransport : IFormattable {
-      public string AMQP { get; set; }
+      public string Amqp { get; set; }
 
       public string ToString(string format, IFormatProvider formatProvider) {
-        return this.AMQP;
+        return this.Amqp;
       }
     }
   }

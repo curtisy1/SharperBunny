@@ -8,32 +8,32 @@ namespace SharperBunny.Interfaces {
   /// </summary>
   public interface IPublish<T> : IDisposable
     where T : class {
-      /// <summary>
-      ///   Ensures Publisher confirms. Specify onAck and onNack what you want to do in those events
-      ///   , Must be not null.
-      /// </summary>
-      IPublish<T> WithConfirm(Func<BasicAckEventArgs, Task> onAck, Func<BasicNackEventArgs, Task> onNack);
+    /// <summary>
+    ///   Ensures Publisher confirms. Specify onAck and onNack what you want to do in those events
+    ///   , Must be not null.
+    /// </summary>
+    IPublish<T> WithConfirm(Func<BasicAckEventArgs, Task> onAck, Func<BasicNackEventArgs, Task> onNack);
 
-      /// <summary>
-      /// </summary>
-      IPublish<T> AsMandatory(Func<BasicReturnEventArgs, Task> onReturn);
+    /// <summary>
+    /// </summary>
+    IPublish<T> AsMandatory(Func<BasicReturnEventArgs, Task> onReturn);
 
-      /// <summary>
-      ///   Sets deliveryMode equal to 2
-      /// </summary>
-      IPublish<T> AsPersistent();
+    /// <summary>
+    ///   Sets deliveryMode equal to 2
+    /// </summary>
+    IPublish<T> AsPersistent();
 
-      /// <summary>
-      ///   Adds expiry to the send message.
-      /// </summary>
-      IPublish<T> WithExpire(uint expire);
+    /// <summary>
+    ///   Adds expiry to the send message.
+    /// </summary>
+    IPublish<T> WithExpire(uint expire);
 
-      /// <summary>
-      ///   Asynchronously sends the Message to the MessageBroker. Force flag creates the exchange if it does not exist yet.
-      ///   THe OperationResult tells you if the message was routed successfully. For full message reliability activate
-      ///   AsMandatory as well as WithConfirm and handle the respective events.
-      /// </summary>
-      Task<OperationResult<T>> SendAsync(T message, bool force = false);
+    /// <summary>
+    ///   Asynchronously sends the Message to the MessageBroker. Force flag creates the exchange if it does not exist yet.
+    ///   THe OperationResult tells you if the message was routed successfully. For full message reliability activate
+    ///   AsMandatory as well as WithConfirm and handle the respective events.
+    /// </summary>
+    Task<OperationResult<T>> SendAsync(T message, bool force = false);
 
     IPublish<T> WithSerialize(Func<T, byte[]> serialize);
 

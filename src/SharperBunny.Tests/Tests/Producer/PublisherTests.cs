@@ -6,12 +6,12 @@ namespace SharperBunny.Tests.Producer {
   using Xunit;
 
   public class PublisherTests {
-    private readonly string Exchange = ""; // default --> " "
+    private readonly string exchange = ""; // default --> " "
 
     [Fact]
     public async Task PublisherSimplySendsWithoutQueueReturnsFailure() {
       var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
-      var publisher = bunny.Publisher<TestMessage>(this.Exchange);
+      var publisher = bunny.Publisher<TestMessage>(this.exchange);
 
       var result = await publisher.SendAsync(new TestMessage());
 
@@ -22,7 +22,7 @@ namespace SharperBunny.Tests.Producer {
     [Fact]
     public async Task PublisherSimplySendsWitQueueReturnsSuccess() {
       var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
-      var publisher = bunny.Publisher<TestMessage>(this.Exchange);
+      var publisher = bunny.Publisher<TestMessage>(this.exchange);
 
       var result = await publisher
                      .WithQueueDeclare()
@@ -43,8 +43,8 @@ namespace SharperBunny.Tests.Producer {
       var result = await publisher.SendAsync(new TestMessage(), true);
 
       Assert.True(result.IsSuccess);
-      bool removed_exchange = await bunny.Setup().DeleteExchangeAsync("test-exchange", force: true);
-      Assert.True(removed_exchange);
+      bool removedExchange = await bunny.Setup().DeleteExchangeAsync("test-exchange", force: true);
+      Assert.True(removedExchange);
       bunny.Dispose();
     }
 

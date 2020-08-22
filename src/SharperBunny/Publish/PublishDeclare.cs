@@ -12,10 +12,10 @@ namespace SharperBunny.Publish {
   public class DeclarePublisher<T> : IPublish<T>
     where T : class {
     internal DeclarePublisher(IBunny bunny, string publishTo) {
-      this._bunny = bunny;
-      this._publishTo = publishTo;
-      this._serialize = Config.Serialize;
-      this._thisChannel = new PermanentChannel(bunny);
+      this.bunny = bunny;
+      this.publishTo = publishTo;
+      this.serialize = Config.Serialize;
+      this.thisChannel = new PermanentChannel(bunny);
     }
 
     #region Send
@@ -25,29 +25,29 @@ namespace SharperBunny.Publish {
       operationResult.Message = msg;
       IModel channel = null;
       try {
-        channel = this._thisChannel.Channel;
+        channel = this.thisChannel.Channel;
 
         var properties = ConstructProperties(channel.CreateBasicProperties(), this.Persistent, this.Expires);
         this.Handlers(channel);
 
-        if (this._queueDeclare != null) {
-          await this._queueDeclare.DeclareAsync();
+        if (this.queueDeclare != null) {
+          await this.queueDeclare.DeclareAsync();
         }
 
         if (force) {
-          await this._bunny.Setup()
-            .Exchange(this._publishTo)
+          await this.bunny.Setup()
+            .Exchange(this.publishTo)
             .AsDurable()
             .DeclareAsync();
         }
 
         await Task.Run(() => {
-          if (this._useConfirm) {
+          if (this.useConfirm) {
             channel.ConfirmSelect();
           }
 
-          channel.BasicPublish(this._publishTo, this.RoutingKey, this.Mandatory, properties, this._serialize(msg));
-          if (this._useConfirm) {
+          channel.BasicPublish(this.publishTo, this.RoutingKey, this.Mandatory, properties, this.serialize(msg));
+          if (this.useConfirm) {
             channel.WaitForConfirmsOrDie();
           }
         });
@@ -59,7 +59,7 @@ namespace SharperBunny.Publish {
         operationResult.Error = ex;
         operationResult.State = OperationState.Failed;
       } finally {
-        if (this._uniqueChannel) {
+        if (this.uniqueChannel) {
           this.Handlers(channel, true);
           channel?.Close();
         }
@@ -72,15 +72,15 @@ namespace SharperBunny.Publish {
 
     #region immutable fields
 
-    private readonly IBunny _bunny;
-    private readonly PermanentChannel _thisChannel;
-    private readonly string _publishTo;
+    private readonly IBunny bunny;
+    private readonly PermanentChannel thisChannel;
+    private readonly string publishTo;
 
     #endregion
 
     #region mutable fields
 
-    private Func<T, byte[]> _serialize;
+    private Func<T, byte[]> serialize;
     private bool Mandatory { get; set; }
     private bool ConfirmActivated { get; set; }
     private bool Persistent { get; set; }
@@ -88,25 +88,25 @@ namespace SharperBunny.Publish {
 
     private string RoutingKey {
       get {
-        if (this._routingKey != null) {
-          return this._routingKey;
+        if (this.routingKey != null) {
+          return this.routingKey;
         }
 
-        if (this._queueDeclare != null) {
-          return this._queueDeclare.RoutingKey;
+        if (this.queueDeclare != null) {
+          return this.queueDeclare.RoutingKey;
         }
 
         return typeof(T).FullName;
       }
     }
 
-    private string _routingKey;
-    private bool _uniqueChannel;
-    private IQueue _queueDeclare;
-    private bool _useConfirm;
-    private Func<BasicReturnEventArgs, Task> _returnCallback = context => Task.CompletedTask;
-    private Func<BasicAckEventArgs, Task> _ackCallback = context => Task.CompletedTask;
-    private Func<BasicNackEventArgs, Task> _nackCallback = context => Task.CompletedTask;
+    private string routingKey;
+    private bool uniqueChannel;
+    private IQueue queueDeclare;
+    private bool useConfirm;
+    private Func<BasicReturnEventArgs, Task> returnCallback = context => Task.CompletedTask;
+    private Func<BasicAckEventArgs, Task> ackCallback = context => Task.CompletedTask;
+    private Func<BasicNackEventArgs, Task> nackCallback = context => Task.CompletedTask;
 
     #endregion
 
@@ -121,7 +121,7 @@ namespace SharperBunny.Publish {
         }
       }
 
-      if (this._useConfirm) {
+      if (this.useConfirm) {
         if (dismantle) {
           channel.BasicNacks -= this.HandleNack;
           channel.BasicAcks -= this.HandleAck;
@@ -133,15 +133,15 @@ namespace SharperBunny.Publish {
     }
 
     private async void HandleReturn(object sender, BasicReturnEventArgs eventArgs) {
-      await this._returnCallback(eventArgs);
+      await this.returnCallback(eventArgs);
     }
 
     private async void HandleAck(object sender, BasicAckEventArgs eventArgs) {
-      await this._ackCallback(eventArgs);
+      await this.ackCallback(eventArgs);
     }
 
     private async void HandleNack(object sender, BasicNackEventArgs eventArgs) {
-      await this._nackCallback(eventArgs);
+      await this.nackCallback(eventArgs);
     }
 
     public static IBasicProperties ConstructProperties(IBasicProperties basicProperties, bool persistent, int? expires) {
@@ -164,7 +164,7 @@ namespace SharperBunny.Publish {
     #region Declarations
 
     public IPublish<T> AsMandatory(Func<BasicReturnEventArgs, Task> onReturn) {
-      this._returnCallback = onReturn;
+      this.returnCallback = onReturn;
       this.Mandatory = true;
       return this;
     }
@@ -179,9 +179,9 @@ namespace SharperBunny.Publish {
         throw DeclarationException.Argument(new ArgumentException("handlers for ack and nack must not be null"));
       }
 
-      this._useConfirm = true;
-      this._ackCallback = onAck;
-      this._nackCallback = onNack;
+      this.useConfirm = true;
+      this.ackCallback = onAck;
+      this.nackCallback = onNack;
       return this;
     }
 
@@ -191,29 +191,29 @@ namespace SharperBunny.Publish {
     }
 
     public IPublish<T> WithSerialize(Func<T, byte[]> serialize) {
-      this._serialize = serialize;
+      this.serialize = serialize;
       return this;
     }
 
     public IPublish<T> WithRoutingKey(string routingKey) {
-      this._routingKey = routingKey;
+      this.routingKey = routingKey;
       return this;
     }
 
     public IPublish<T> UseUniqueChannel(bool uniqueChannel = true) {
-      this._uniqueChannel = uniqueChannel;
+      this.uniqueChannel = uniqueChannel;
       return this;
     }
 
     public IPublish<T> WithQueueDeclare(string queueName = null, string routingKey = null, string exchangeName = "amq.direct") {
       var name = queueName ?? typeof(T).FullName;
       var rKey = routingKey ?? typeof(T).FullName;
-      this._queueDeclare = this._bunny.Setup().Queue(name).Bind(exchangeName, rKey).AsDurable();
+      this.queueDeclare = this.bunny.Setup().Queue(name).Bind(exchangeName, rKey).AsDurable();
       return this;
     }
 
     public IPublish<T> WithQueueDeclare(IQueue queueDeclare) {
-      this._queueDeclare = queueDeclare;
+      this.queueDeclare = queueDeclare;
       return this;
     }
 
@@ -226,8 +226,8 @@ namespace SharperBunny.Publish {
     protected virtual void Dispose(bool disposing) {
       if (!this.disposedValue) {
         if (disposing) {
-          this.Handlers(this._thisChannel.Channel, true);
-          this._thisChannel.Dispose();
+          this.Handlers(this.thisChannel.Channel, true);
+          this.thisChannel.Dispose();
         }
 
         this.disposedValue = true;

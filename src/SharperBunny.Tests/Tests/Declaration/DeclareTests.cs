@@ -63,7 +63,7 @@ namespace SharperBunny.Tests.Declaration {
         .Bind("amq.direct", "bind-test-key")
         .AsDurable()
         .QueueExpiry(1500)
-        .WithTTL(500)
+        .WithTtl(500)
         .MaxLength(10);
 
       await declare.DeclareAsync();

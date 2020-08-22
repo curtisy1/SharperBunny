@@ -6,12 +6,12 @@ namespace SharperBunny.Consume {
   using SharperBunny.Interfaces;
 
   public class Carrot<TMsg> : ICarrot<TMsg> {
-    private readonly PermanentChannel _thisChannel;
+    private readonly PermanentChannel thisChannel;
 
     public Carrot(TMsg message, ulong deliveryTag, PermanentChannel thisChannel) {
       this.Message = message;
       this.DeliveryTag = deliveryTag;
-      this._thisChannel = thisChannel;
+      this.thisChannel = thisChannel;
     }
 
     public TMsg Message { get; }
@@ -23,7 +23,7 @@ namespace SharperBunny.Consume {
     public async Task<OperationResult<TMsg>> SendAckAsync(bool multiple = false) {
       var result = new OperationResult<TMsg>();
       try {
-        await Task.Run(() => this._thisChannel.Channel.BasicAck(this.DeliveryTag, multiple));
+        await Task.Run(() => this.thisChannel.Channel.BasicAck(this.DeliveryTag, multiple));
         result.IsSuccess = true;
         result.State = OperationState.Acked;
         return result;
@@ -39,7 +39,7 @@ namespace SharperBunny.Consume {
     public async Task<OperationResult<TMsg>> SendNackAsync(bool multiple = false, bool withRequeue = true) {
       var result = new OperationResult<TMsg>();
       try {
-        await Task.Run(() => this._thisChannel.Channel.BasicNack(this.DeliveryTag, multiple, withRequeue));
+        await Task.Run(() => this.thisChannel.Channel.BasicNack(this.DeliveryTag, multiple, withRequeue));
         result.IsSuccess = true;
         result.State = OperationState.Nacked;
 

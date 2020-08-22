@@ -13,8 +13,8 @@ namespace SharperBunny.Declare {
   using SharperBunny.Utils;
 
   public class DeclareQueue : IQueue {
-    private readonly Dictionary<string, object> _arguments = new Dictionary<string, object>();
-    private bool _wasDeclared;
+    private readonly Dictionary<string, object> arguments = new Dictionary<string, object>();
+    private bool wasDeclared;
 
     internal DeclareQueue(IBunny bunny, string name) {
       this.Name = name;
@@ -38,7 +38,7 @@ namespace SharperBunny.Declare {
     }
 
     public async Task DeclareAsync() {
-      if (this._wasDeclared) {
+      if (this.wasDeclared) {
         return;
       }
 
@@ -57,12 +57,12 @@ namespace SharperBunny.Declare {
         throw DeclarationException.DeclareFailed(exc, "queue-declare failed");
       } finally {
         channel.Close();
-        this._wasDeclared = true;
+        this.wasDeclared = true;
       }
     }
 
     public IQueue AddTag(string key, object value) {
-      this._arguments.Add(key, value);
+      this.arguments.Add(key, value);
       return this;
     }
 
@@ -91,7 +91,7 @@ namespace SharperBunny.Declare {
                                              this.Durable.HasValue ? this.Durable.Value : true,
                                              false,
                                              this.AutoDelete.HasValue ? this.AutoDelete.Value : false,
-                                             this._arguments.Any() ? this._arguments : null));
+                                             this.arguments.Any() ? this.arguments : null));
     }
 
     private async Task Bind(IModel channel) {

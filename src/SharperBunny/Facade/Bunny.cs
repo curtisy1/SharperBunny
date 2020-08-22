@@ -8,39 +8,39 @@ namespace SharperBunny.Facade {
   ///   Encapsulates the single broker connect
   /// </summary>
   public class Bunny : IBunny {
-    private readonly ConnectionFactory _factory;
-    private readonly List<IModel> _model = new List<IModel>();
-    private IConnection _connection;
+    private readonly ConnectionFactory factory;
+    private readonly List<IModel> model = new List<IModel>();
+    private IConnection connection;
 
     public Bunny(ConnectionFactory fac) {
-      this._connection = fac.CreateConnection();
-      this._factory = fac;
+      this.connection = fac.CreateConnection();
+      this.factory = fac;
     }
 
     public IModel Channel(bool newOne = false) {
-      var open = this._model.Where(x => x.IsOpen).ToList();
-      this._model.Clear();
-      this._model.AddRange(open);
-      if (this._model.Any() == false || newOne) {
-        if (this._connection.IsOpen == false) {
-          this._connection = this._factory.CreateConnection();
+      var open = this.model.Where(x => x.IsOpen).ToList();
+      this.model.Clear();
+      this.model.AddRange(open);
+      if (this.model.Any() == false || newOne) {
+        if (this.connection.IsOpen == false) {
+          this.connection = this.factory.CreateConnection();
         }
 
-        var model = this._connection.CreateModel();
-        this._model.Add(model);
+        var model = this.connection.CreateModel();
+        this.model.Add(model);
         return model;
       }
 
-      return this._model.Last();
+      return this.model.Last();
     }
 
     public IConnection Connection {
       get {
-        if (this._connection.IsOpen) {
-          return this._connection;
+        if (this.connection.IsOpen) {
+          return this.connection;
         }
 
-        return this._factory.CreateConnection();
+        return this.factory.CreateConnection();
       }
     }
 
@@ -51,9 +51,9 @@ namespace SharperBunny.Facade {
     protected virtual void Dispose(bool disposing) {
       if (!this.disposedValue) {
         if (disposing) {
-          if (this._connection.IsOpen) {
-            this._model.ForEach(x => x.Dispose());
-            this._connection.Close();
+          if (this.connection.IsOpen) {
+            this.model.ForEach(x => x.Dispose());
+            this.connection.Close();
           }
         }
 

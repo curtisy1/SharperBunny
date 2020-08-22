@@ -8,45 +8,45 @@ namespace SharperBunny.Facade {
   ///   Encapsulates the cluster connect
   /// </summary>
   public class MultiBunny : IBunny {
-    private readonly IList<AmqpTcpEndpoint> _amqps;
-    private readonly IConnectionFactory _factory;
-    private readonly List<IModel> _models = new List<IModel>();
-    private IConnection _connection;
+    private readonly IList<AmqpTcpEndpoint> amqps;
+    private readonly IConnectionFactory factory;
+    private readonly List<IModel> models = new List<IModel>();
+    private IConnection connection;
 
     public MultiBunny(IConnectionFactory factory, IList<AmqpTcpEndpoint> endpoints) {
-      this._factory = factory;
-      this._amqps = endpoints;
+      this.factory = factory;
+      this.amqps = endpoints;
 
-      this._connection = factory.CreateConnection(endpoints);
+      this.connection = factory.CreateConnection(endpoints);
     }
 
     public IModel Channel(bool newOne = false) {
-      var open = this._models.Where(x => x.IsOpen).ToList();
-      this._models.Clear();
-      this._models.AddRange(open);
-      if (this._models.Any() == false || newOne) {
-        if (this._connection.IsOpen == false) {
+      var open = this.models.Where(x => x.IsOpen).ToList();
+      this.models.Clear();
+      this.models.AddRange(open);
+      if (this.models.Any() == false || newOne) {
+        if (this.connection.IsOpen == false) {
           this.SetConnected();
         }
 
-        var model = this._connection.CreateModel();
-        this._models.Add(model);
+        var model = this.connection.CreateModel();
+        this.models.Add(model);
         return model;
       }
 
-      return this._models.Last();
+      return this.models.Last();
     }
 
     public IConnection Connection {
       get {
         this.SetConnected();
-        return this._connection;
+        return this.connection;
       }
     }
 
     private void SetConnected() {
-      if (this._connection.IsOpen == false) {
-        this._connection = this._factory.CreateConnection(this._amqps);
+      if (this.connection.IsOpen == false) {
+        this.connection = this.factory.CreateConnection(this.amqps);
       }
     }
 
@@ -57,8 +57,8 @@ namespace SharperBunny.Facade {
     protected virtual void Dispose(bool disposing) {
       if (!this.disposedValue) {
         if (disposing) {
-          if (this._connection.IsOpen) {
-            this._connection.Dispose();
+          if (this.connection.IsOpen) {
+            this.connection.Dispose();
           }
         }
 

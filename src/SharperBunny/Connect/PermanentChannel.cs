@@ -7,22 +7,22 @@ namespace SharperBunny.Connect {
   ///   Encapsulates reconnect
   /// </summary>
   public class PermanentChannel : IDisposable {
-    private readonly IBunny _bunny;
-    private IModel _model;
+    private readonly IBunny bunny;
+    private IModel model;
     private bool disposedValue;
 
     public PermanentChannel(IBunny bunny) {
-      this._bunny = bunny;
+      this.bunny = bunny;
     }
 
     public IModel Channel {
       get {
-        var create = this._model == null || this._model.IsClosed;
+        var create = this.model == null || this.model.IsClosed;
         if (create) {
-          this._model = this._bunny.Channel(true);
+          this.model = this.bunny.Channel(true);
         }
 
-        return this._model;
+        return this.model;
       }
     }
 
@@ -37,7 +37,7 @@ namespace SharperBunny.Connect {
     protected virtual void Dispose(bool disposing) {
       if (!this.disposedValue) {
         if (disposing) {
-          this._model?.Close();
+          this.model?.Close();
         }
 
         this.disposedValue = true;

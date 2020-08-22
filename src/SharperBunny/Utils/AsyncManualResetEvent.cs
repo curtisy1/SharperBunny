@@ -3,21 +3,21 @@ namespace SharperBunny.Utils {
   using System.Threading.Tasks;
 
   public class AsyncManualResetEvent {
-    private volatile TaskCompletionSource<bool> _tcs = new TaskCompletionSource<bool>();
+    private volatile TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
 
     public Task WaitAsync() {
-      return this._tcs.Task;
+      return this.tcs.Task;
     }
 
     public void Set() {
-      this._tcs.TrySetResult(true);
+      this.tcs.TrySetResult(true);
     }
 
     public void Reset() {
       while (true) {
-        var tcs = this._tcs;
+        var tcs = this.tcs;
         if (!tcs.Task.IsCompleted ||
-            Interlocked.CompareExchange(ref this._tcs, new TaskCompletionSource<bool>(), tcs) == tcs) {
+            Interlocked.CompareExchange(ref this.tcs, new TaskCompletionSource<bool>(), tcs) == tcs) {
           return;
         }
       }

@@ -3,8 +3,8 @@ namespace SharperBunny.Tests.Connection {
   using Xunit;
 
   public class ConnectSimple {
-    private static readonly string _virtualHost = "unittests";
-    internal static string BasicAmqp => $"amqp://guest:guest@localhost:5672/{_virtualHost}";
+    private static readonly string VirtualHost = "unittests";
+    internal static string BasicAmqp => $"amqp://guest:guest@localhost:5672/{VirtualHost}";
 
     internal static IBunny Connect() {
       return Bunny.ConnectSingle(BasicAmqp);
@@ -40,8 +40,8 @@ namespace SharperBunny.Tests.Connection {
 
     [Fact]
     public void ConnectMultipleFailsFirstConnectsSecond() {
-      var node1 = $"amqp://guest:guest@localhost:5673/{_virtualHost}";
-      var node2 = $"amqp://guest:guest@localhost:5672/{_virtualHost}";
+      var node1 = $"amqp://guest:guest@localhost:5673/{VirtualHost}";
+      var node2 = $"amqp://guest:guest@localhost:5672/{VirtualHost}";
 
       var multi = Bunny.ClusterConnect();
       multi.AddNode(node1);

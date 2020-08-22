@@ -1,9 +1,9 @@
 namespace SharperBunny.Interfaces {
   public interface IQueue : IDeclare {
-      /// <summary>
-      ///   Defaults to Queue.Name. Is set with the Bind Method.
-      /// </summary>
-      string RoutingKey { get; }
+    /// <summary>
+    ///   Defaults to Queue.Name. Is set with the Bind Method.
+    /// </summary>
+    string RoutingKey { get; }
 
     string Name { get; }
 

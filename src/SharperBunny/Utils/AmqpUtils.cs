@@ -3,8 +3,8 @@ namespace SharperBunny.Utils {
   using RabbitMQ.Client;
 
   public static class AmqpUtils {
-    public static AmqpTcpEndpoint ParseEndpoint(this string amqp_uri) {
-      return new AmqpTcpEndpoint(new Uri(amqp_uri));
+    public static AmqpTcpEndpoint ParseEndpoint(this string amqpUri) {
+      return new AmqpTcpEndpoint(new Uri(amqpUri));
     }
   }
 }
