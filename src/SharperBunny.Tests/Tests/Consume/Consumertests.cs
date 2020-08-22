@@ -4,7 +4,10 @@ namespace SharperBunny.Tests.Consume {
   using System.Text.Json;
   using System.Threading.Tasks;
   using SharperBunny.Configuration;
+  using SharperBunny.Declare;
+  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
+  using SharperBunny.Tests.Connection;
   using Xunit;
 
   public class Consumertests {

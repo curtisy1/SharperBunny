@@ -1,7 +1,5 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("tests")]
-
 namespace SharperBunny.Declare {
   using System;
   using System.Collections.Generic;
@@ -9,8 +7,8 @@ namespace SharperBunny.Declare {
   using System.Threading.Tasks;
   using RabbitMQ.Client;
   using SharperBunny.Exceptions;
+  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
-  using SharperBunny.Utils;
 
   public class DeclareQueue : IQueue {
     private readonly Dictionary<string, object> arguments = new Dictionary<string, object>();
@@ -21,21 +19,13 @@ namespace SharperBunny.Declare {
       this.Bunny = bunny;
     }
 
-    internal bool? Durable { get; set; } = false;
+    private bool? Durable { get; set; } = false;
     internal (string ex, string rKey)? BindingKey { get; set; }
-    internal bool? AutoDelete { get; set; }
+    private bool? AutoDelete { get; set; }
     public IBunny Bunny { get; set; }
     public string Name { get; }
 
-    public string RoutingKey {
-      get {
-        if (this.BindingKey.HasValue) {
-          return this.BindingKey.Value.rKey;
-        }
-
-        return this.Name;
-      }
-    }
+    public string RoutingKey => this.BindingKey.HasValue ? this.BindingKey.Value.rKey : this.Name;
 
     public async Task DeclareAsync() {
       if (this.wasDeclared) {
@@ -56,7 +46,7 @@ namespace SharperBunny.Declare {
       } catch (Exception exc) {
         throw DeclarationException.DeclareFailed(exc, "queue-declare failed");
       } finally {
-        channel.Close();
+        channel?.Close();
         this.wasDeclared = true;
       }
     }

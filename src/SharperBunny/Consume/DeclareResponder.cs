@@ -2,9 +2,10 @@ namespace SharperBunny.Consume {
   using System;
   using System.Threading.Tasks;
   using SharperBunny.Configuration;
-  using SharperBunny.Connect;
+  using SharperBunny.Connection;
   using SharperBunny.Declare;
   using SharperBunny.Exceptions;
+  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class DeclareResponder<TRequest, TResponse> : IRespond<TRequest, TResponse>

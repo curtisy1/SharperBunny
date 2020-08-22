@@ -1,10 +1,10 @@
-﻿namespace SharperBunny.Tests.IntergrationTests {
+﻿namespace SharperBunny.Tests.IntegrationTests {
   using System;
 
-  internal class Program {
+  internal static class Program {
     private static void Main(string[] args) {
       var pipe = Bunny.ConnectSingleWith();
-      IBunny bunny = pipe.Connect();
+      var bunny = pipe.Connect();
 
       Console.ReadLine();
     }

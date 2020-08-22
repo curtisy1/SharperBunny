@@ -3,7 +3,9 @@ namespace SharperBunny.Tests.Declaration {
   using System.Threading.Tasks;
   using SharperBunny.Declare;
   using SharperBunny.Exceptions;
+  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
+  using SharperBunny.Tests.Connection;
   using Xunit;
 
   public class DeclareTests {

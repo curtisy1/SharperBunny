@@ -4,7 +4,7 @@ namespace SharperBunny.Consume {
   using System.Threading.Tasks;
   using RabbitMQ.Client.Events;
   using SharperBunny.Configuration;
-  using SharperBunny.Connect;
+  using SharperBunny.Connection;
   using SharperBunny.Interfaces;
 
   public class DeclareConsumer<TMsg> : IConsume<TMsg> {

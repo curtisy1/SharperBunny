@@ -1,29 +1,29 @@
 namespace SharperBunny.Interfaces {
-  using SharperBunny.Connect;
+  using SharperBunny.Connection;
 
   /// <summary>
   ///   Builder Interface for Cluster connect
   /// </summary>
-  public interface IConnector {
+  public interface IConnectionCluster {
     /// <summary>
-    ///   Add a node by sepcifying the amqp uri
+    ///   Add a node by specifying the amqp uri
     /// </summary>
-    IConnector AddNode(string amqpUri);
+    IConnectionCluster AddNode(string amqpUri);
 
     /// <summary>
     ///   Add a node by using the ConnectionPipe interface
     /// </summary>
-    IConnector AddNode(IConnectPipe pipe);
+    IConnectionCluster AddNode(IConnectionPipe pipe);
 
     /// <summary>
     ///   Add a node by using ConnectionParameters
     /// </summary>
-    IConnector AddNode(ConnectionParameters parameters);
+    IConnectionCluster AddNode(ConnectionParameters parameters);
 
     /// <summary>
     ///   specify the Retry attempts
     /// </summary>
-    IConnector WithRetry(int retry = 5, int timeout = 2);
+    IConnectionCluster WithRetries(int retry = 5, int timeout = 2);
 
     IBunny Connect();
   }

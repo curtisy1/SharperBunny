@@ -4,8 +4,8 @@ namespace SharperBunny.Declare {
   using System.Threading.Tasks;
   using RabbitMQ.Client;
   using SharperBunny.Exceptions;
+  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
-  using SharperBunny.Utils;
 
   public class DeclareExchange : IExchange {
     private readonly Dictionary<string, object> args = new Dictionary<string, object>();

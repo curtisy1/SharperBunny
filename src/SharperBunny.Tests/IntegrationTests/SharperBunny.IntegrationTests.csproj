@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="../..SharperBunny/SharperBunny.csproj" />
+    <ProjectReference Include="..\..\SharperBunny\SharperBunny.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>SharperBunny.Tests.IntergrationTests</RootNamespace>
+    <RootNamespace>SharperBunny.Tests.IntegrationTests</RootNamespace>
   </PropertyGroup>
 
 </Project>

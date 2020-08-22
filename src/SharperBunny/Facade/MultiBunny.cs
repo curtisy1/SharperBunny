@@ -8,14 +8,14 @@ namespace SharperBunny.Facade {
   ///   Encapsulates the cluster connect
   /// </summary>
   public class MultiBunny : IBunny {
-    private readonly IList<AmqpTcpEndpoint> amqps;
+    private readonly IList<AmqpTcpEndpoint> endpoints;
     private readonly IConnectionFactory factory;
     private readonly List<IModel> models = new List<IModel>();
     private IConnection connection;
 
     public MultiBunny(IConnectionFactory factory, IList<AmqpTcpEndpoint> endpoints) {
       this.factory = factory;
-      this.amqps = endpoints;
+      this.endpoints = endpoints;
 
       this.connection = factory.CreateConnection(endpoints);
     }
@@ -24,17 +24,15 @@ namespace SharperBunny.Facade {
       var open = this.models.Where(x => x.IsOpen).ToList();
       this.models.Clear();
       this.models.AddRange(open);
-      if (this.models.Any() == false || newOne) {
-        if (this.connection.IsOpen == false) {
-          this.SetConnected();
-        }
-
-        var model = this.connection.CreateModel();
-        this.models.Add(model);
-        return model;
+      if (this.models.Any() && !newOne) {
+        return this.models.Last();
       }
 
-      return this.models.Last();
+      this.SetConnected();
+
+      var model = this.connection.CreateModel();
+      this.models.Add(model);
+      return model;
     }
 
     public IConnection Connection {
@@ -45,8 +43,8 @@ namespace SharperBunny.Facade {
     }
 
     private void SetConnected() {
-      if (this.connection.IsOpen == false) {
-        this.connection = this.factory.CreateConnection(this.amqps);
+      if (!this.connection.IsOpen) {
+        this.connection = this.factory.CreateConnection(this.endpoints);
       }
     }
 
@@ -55,15 +53,18 @@ namespace SharperBunny.Facade {
     private bool disposedValue; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing) {
-      if (!this.disposedValue) {
-        if (disposing) {
-          if (this.connection.IsOpen) {
-            this.connection.Dispose();
-          }
-        }
-
-        this.disposedValue = true;
+      if (this.disposedValue) {
+        return;
       }
+
+      if (disposing) {
+        if (this.connection.IsOpen) {
+          this.models.ForEach(x => x.Dispose());
+          this.connection.Dispose();
+        }
+      }
+
+      this.disposedValue = true;
     }
 
     public void Dispose() {

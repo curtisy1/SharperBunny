@@ -2,7 +2,7 @@ namespace SharperBunny.Consume {
   using System;
   using System.Threading.Tasks;
   using RabbitMQ.Client;
-  using SharperBunny.Connect;
+  using SharperBunny.Connection;
   using SharperBunny.Interfaces;
 
   public class Carrot<TMsg> : ICarrot<TMsg> {

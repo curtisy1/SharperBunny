@@ -4,9 +4,10 @@ namespace SharperBunny.Publish {
   using RabbitMQ.Client;
   using RabbitMQ.Client.Events;
   using SharperBunny.Configuration;
-  using SharperBunny.Connect;
+  using SharperBunny.Connection;
   using SharperBunny.Declare;
   using SharperBunny.Exceptions;
+  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class DeclarePublisher<T> : IPublish<T>

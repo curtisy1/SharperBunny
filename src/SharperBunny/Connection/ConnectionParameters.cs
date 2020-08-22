@@ -1,8 +1,8 @@
-namespace SharperBunny.Connect {
+namespace SharperBunny.Connection {
   using System;
 
   /// <summary>
-  ///   Specify Connectionparameters by using Properties.
+  ///   Specify ConnectionParameters by using Properties.
   ///   Virtualhost defaults to '/'
   /// </summary>
   public class ConnectionParameters : IFormattable {

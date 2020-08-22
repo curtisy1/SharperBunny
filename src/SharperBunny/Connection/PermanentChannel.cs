@@ -1,4 +1,4 @@
-namespace SharperBunny.Connect {
+namespace SharperBunny.Connection {
   using System;
   using RabbitMQ.Client;
   using SharperBunny.Interfaces;
@@ -35,13 +35,15 @@ namespace SharperBunny.Connect {
     }
 
     protected virtual void Dispose(bool disposing) {
-      if (!this.disposedValue) {
-        if (disposing) {
-          this.model?.Close();
-        }
-
-        this.disposedValue = true;
+      if (this.disposedValue) {
+        return;
       }
+
+      if (disposing) {
+        this.model?.Close();
+      }
+
+      this.disposedValue = true;
     }
   }
 }

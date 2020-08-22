@@ -3,8 +3,8 @@ namespace SharperBunny.Declare {
   using System.Threading.Tasks;
   using RabbitMQ.Client;
   using SharperBunny.Exceptions;
+  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
-  using SharperBunny.Utils;
 
   public static class DeclareQueueExtensions {
     #region Checks

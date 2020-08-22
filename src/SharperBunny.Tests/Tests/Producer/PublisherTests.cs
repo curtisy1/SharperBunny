@@ -2,7 +2,10 @@ namespace SharperBunny.Tests.Producer {
   using System;
   using System.Threading.Tasks;
   using RabbitMQ.Client.Events;
+  using SharperBunny.Declare;
+  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
+  using SharperBunny.Tests.Connection;
   using Xunit;
 
   public class PublisherTests {
@@ -28,7 +31,7 @@ namespace SharperBunny.Tests.Producer {
                      .WithQueueDeclare()
                      .SendAsync(new TestMessage());
 
-      bool success = await bunny.Setup().DeleteQueueAsync(typeof(TestMessage).FullName, force: true);
+      var success = await bunny.Setup().DeleteQueueAsync(typeof(TestMessage).FullName, force: true);
 
       Assert.True(result.IsSuccess);
       Assert.True(success);
@@ -43,7 +46,7 @@ namespace SharperBunny.Tests.Producer {
       var result = await publisher.SendAsync(new TestMessage(), true);
 
       Assert.True(result.IsSuccess);
-      bool removedExchange = await bunny.Setup().DeleteExchangeAsync("test-exchange", force: true);
+      var removedExchange = await bunny.Setup().DeleteExchangeAsync("test-exchange", force: true);
       Assert.True(removedExchange);
       bunny.Dispose();
     }
@@ -51,7 +54,7 @@ namespace SharperBunny.Tests.Producer {
     [Fact]
     public async Task ConfirmsAndAcksWork() {
       var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
-      IQueue queue = bunny.Setup()
+      var queue = bunny.Setup()
         .Queue("constraint")
         .MaxLength(1)
         .QueueExpiry(1500)
@@ -119,7 +122,7 @@ namespace SharperBunny.Tests.Producer {
         .WithQueueDeclare()
         .SendAsync(new TestMessage { Text = "Mandatory-succeeds" });
 
-      bool removed = await bunny.Setup().DeleteQueueAsync(typeof(TestMessage).FullName, force: true);
+      var removed = await bunny.Setup().DeleteQueueAsync(typeof(TestMessage).FullName, force: true);
 
       Assert.True(isReturned);
       bunny.Dispose();
