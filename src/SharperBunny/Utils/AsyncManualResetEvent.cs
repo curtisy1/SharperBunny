@@ -1,28 +1,26 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace SharperBunny.Utils {
-    public class AsyncManualResetEvent {
-        private volatile TaskCompletionSource<bool> _tcs = new TaskCompletionSource<bool> ();
+  using System.Threading;
+  using System.Threading.Tasks;
 
-        public Task WaitAsync () {
-            return _tcs.Task;
-        }
+  public class AsyncManualResetEvent {
+    private volatile TaskCompletionSource<bool> _tcs = new TaskCompletionSource<bool>();
 
-        public void Set () {
-            _tcs.TrySetResult (result: true);
-        }
-
-        public void Reset () {
-            while (true) {
-                var tcs = _tcs;
-                if (!tcs.Task.IsCompleted ||
-                    Interlocked.CompareExchange (ref _tcs, new TaskCompletionSource<bool> (), tcs) == tcs) {
-                    return;
-                }
-            }
-        }
+    public Task WaitAsync() {
+      return this._tcs.Task;
     }
+
+    public void Set() {
+      this._tcs.TrySetResult(true);
+    }
+
+    public void Reset() {
+      while (true) {
+        var tcs = this._tcs;
+        if (!tcs.Task.IsCompleted ||
+            Interlocked.CompareExchange(ref this._tcs, new TaskCompletionSource<bool>(), tcs) == tcs) {
+          return;
+        }
+      }
+    }
+  }
 }

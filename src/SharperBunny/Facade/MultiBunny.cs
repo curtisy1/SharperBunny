@@ -1,66 +1,75 @@
-using System.Collections.Generic;
-using System.Linq;
-using RabbitMQ.Client;
-
 namespace SharperBunny.Facade {
-    ///<summary>
-    /// Encapsulates the cluster connect
-    ///</summary>
-    public class MultiBunny : IBunny {
-        private IConnection _connection;
-        private readonly IConnectionFactory _factory;
-        private readonly IList<AmqpTcpEndpoint> _amqps;
-        private readonly List<IModel> _models = new List<IModel> ();
-        public MultiBunny (IConnectionFactory factory, IList<AmqpTcpEndpoint> endpoints) {
-            _factory = factory;
-            _amqps = endpoints;
+  using System.Collections.Generic;
+  using System.Linq;
+  using RabbitMQ.Client;
+  using SharperBunny.Interfaces;
 
-            _connection = factory.CreateConnection (endpoints);
-        }
+  /// <summary>
+  ///   Encapsulates the cluster connect
+  /// </summary>
+  public class MultiBunny : IBunny {
+    private readonly IList<AmqpTcpEndpoint> _amqps;
+    private readonly IConnectionFactory _factory;
+    private readonly List<IModel> _models = new List<IModel>();
+    private IConnection _connection;
 
-        public IModel Channel (bool newOne = false) {
-            var open = _models.Where (x => x.IsOpen).ToList ();
-            _models.Clear ();
-            _models.AddRange (open);
-            if (_models.Any () == false || newOne) {
-                if (_connection.IsOpen == false) {
-                    SetConnected ();
-                }
-                var model = _connection.CreateModel ();
-                _models.Add (model);
-                return model;
-            } else {
-                return _models.Last ();
-            }
-        }
+    public MultiBunny(IConnectionFactory factory, IList<AmqpTcpEndpoint> endpoints) {
+      this._factory = factory;
+      this._amqps = endpoints;
 
-        private void SetConnected () {
-            if (_connection.IsOpen == false) {
-                _connection = _factory.CreateConnection (_amqps);
-            }
-        }
-
-        public IConnection Connection {
-            get {
-                SetConnected ();
-                return _connection;
-            }
-        }
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose (bool disposing) {
-            if (!disposedValue) {
-                if (disposing) {
-                    if (_connection.IsOpen)
-                        _connection.Dispose ();
-                }
-                disposedValue = true;
-            }
-        }
-        public void Dispose () {
-            Dispose (true);
-        }
-        #endregion
+      this._connection = factory.CreateConnection(endpoints);
     }
+
+    public IModel Channel(bool newOne = false) {
+      var open = this._models.Where(x => x.IsOpen).ToList();
+      this._models.Clear();
+      this._models.AddRange(open);
+      if (this._models.Any() == false || newOne) {
+        if (this._connection.IsOpen == false) {
+          this.SetConnected();
+        }
+
+        var model = this._connection.CreateModel();
+        this._models.Add(model);
+        return model;
+      }
+
+      return this._models.Last();
+    }
+
+    public IConnection Connection {
+      get {
+        this.SetConnected();
+        return this._connection;
+      }
+    }
+
+    private void SetConnected() {
+      if (this._connection.IsOpen == false) {
+        this._connection = this._factory.CreateConnection(this._amqps);
+      }
+    }
+
+    #region IDisposable Support
+
+    private bool disposedValue; // To detect redundant calls
+
+    protected virtual void Dispose(bool disposing) {
+      if (!this.disposedValue) {
+        if (disposing) {
+          if (this._connection.IsOpen) {
+            this._connection.Dispose();
+          }
+        }
+
+        this.disposedValue = true;
+      }
+    }
+
+    public void Dispose() {
+      this.Dispose(true);
+    }
+
+    #endregion
+  }
 }

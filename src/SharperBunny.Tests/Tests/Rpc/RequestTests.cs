@@ -1,49 +1,44 @@
-using System.Threading.Tasks;
-using BunnyTests;
-using SharperBunny;
-using Xunit;
+namespace SharperBunny.Tests.Rpc {
+  using System.Threading.Tasks;
+  using Xunit;
 
-namespace SharperBunny.Tests.IntegrationTests.Rpc {
-    public class RequestTests {
-        [Fact]
-        public async Task DirectReplyWorks () {
-            IBunny bunny = Bunny.ConnectSingle (ConnectSimple.BasicAmqp);
-            string rpcExchange = "rpc-exchange";
+  public class RequestTests {
+    [Fact]
+    public async Task DirectReplyWorks() {
+      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var rpcExchange = "rpc-exchange";
 
-            await bunny.Respond<MyRequest, MyResponse> (rpcExchange, rq => {
-                    return Task.FromResult (new MyResponse ());
-                })
-                .StartRespondingAsync ();
+      await bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => { return Task.FromResult(new MyResponse()); })
+        .StartRespondingAsync();
 
-            OperationResult<MyResponse> result = await bunny.Request<MyRequest, MyResponse> (rpcExchange)
-                .RequestAsync (new MyRequest (), force : true);
+      var result = await bunny.Request<MyRequest, MyResponse>(rpcExchange)
+                     .RequestAsync(new MyRequest(), true);
 
-            await Task.Delay (500);
+      await Task.Delay(500);
 
-            Assert.True (result.IsSuccess);
-            Assert.NotNull (result.Message);
-        }
-
-        private class MyRequest { }
-        private class MyResponse { }
-
-        [Fact]
-        public async Task WithTemporaryQueueWorksAlso () {
-            IBunny bunny = Bunny.ConnectSingle (ConnectSimple.BasicAmqp);
-            string rpcExchange = "rpc-exchange";
-
-            await bunny.Respond<MyRequest, MyResponse> (rpcExchange, rq => {
-                    return Task.FromResult (new MyResponse ());
-                })
-                .StartRespondingAsync ();
-
-            OperationResult<MyResponse> result = await bunny.Request<MyRequest, MyResponse> (rpcExchange)
-                .RequestAsync (new MyRequest (), force : true);
-
-            await Task.Delay (500);
-
-            Assert.True (result.IsSuccess);
-            Assert.NotNull (result.Message);
-        }
+      Assert.True(result.IsSuccess);
+      Assert.NotNull(result.Message);
     }
+
+    [Fact]
+    public async Task WithTemporaryQueueWorksAlso() {
+      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var rpcExchange = "rpc-exchange";
+
+      await bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => { return Task.FromResult(new MyResponse()); })
+        .StartRespondingAsync();
+
+      var result = await bunny.Request<MyRequest, MyResponse>(rpcExchange)
+                     .RequestAsync(new MyRequest(), true);
+
+      await Task.Delay(500);
+
+      Assert.True(result.IsSuccess);
+      Assert.NotNull(result.Message);
+    }
+
+    private class MyRequest { }
+
+    private class MyResponse { }
+  }
 }

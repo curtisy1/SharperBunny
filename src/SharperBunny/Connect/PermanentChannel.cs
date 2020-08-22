@@ -1,42 +1,47 @@
-using System;
-using RabbitMQ.Client;
-
 namespace SharperBunny.Connect {
-    ///<summary>
-    /// Encapsulates reconnect
-    ///</summary>
-    public class PermanentChannel : IDisposable {
-        private IModel _model;
-        private readonly IBunny _bunny;
-        public PermanentChannel (IBunny bunny) {
-            _bunny = bunny;
-        }
+  using System;
+  using RabbitMQ.Client;
+  using SharperBunny.Interfaces;
 
-        public IModel Channel {
-            get {
-                bool create = _model == null  || _model.IsClosed;
-                if (create) {
-                    _model = _bunny.Channel (newOne: true);
-                }
+  /// <summary>
+  ///   Encapsulates reconnect
+  /// </summary>
+  public class PermanentChannel : IDisposable {
+    private readonly IBunny _bunny;
+    private IModel _model;
+    private bool disposedValue;
 
-                return _model;
-            }
-        }
-
-        public void StartConfirmMode () => Channel.ConfirmSelect ();
-        private bool disposedValue = false;
-
-        protected virtual void Dispose (bool disposing) {
-            if (!disposedValue) {
-                if (disposing) {
-                    _model?.Close ();
-                }
-                disposedValue = true;
-            }
-        }
-
-        public void Dispose () {
-            Dispose (true);
-        }
+    public PermanentChannel(IBunny bunny) {
+      this._bunny = bunny;
     }
+
+    public IModel Channel {
+      get {
+        var create = this._model == null || this._model.IsClosed;
+        if (create) {
+          this._model = this._bunny.Channel(true);
+        }
+
+        return this._model;
+      }
+    }
+
+    public void Dispose() {
+      this.Dispose(true);
+    }
+
+    public void StartConfirmMode() {
+      this.Channel.ConfirmSelect();
+    }
+
+    protected virtual void Dispose(bool disposing) {
+      if (!this.disposedValue) {
+        if (disposing) {
+          this._model?.Close();
+        }
+
+        this.disposedValue = true;
+      }
+    }
+  }
 }
