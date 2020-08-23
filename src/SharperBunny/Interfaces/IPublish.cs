@@ -26,7 +26,7 @@ namespace SharperBunny.Interfaces {
     /// <summary>
     ///   Adds expiry to the send message.
     /// </summary>
-    IPublish<T> WithExpire(uint expire);
+    IPublish<T> WithExpire(int expire);
 
     /// <summary>
     ///   Asynchronously sends the Message to the MessageBroker. Force flag creates the exchange if it does not exist yet.

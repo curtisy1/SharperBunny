@@ -14,13 +14,13 @@ namespace SharperBunny.Declare {
     private readonly Dictionary<string, object> arguments = new Dictionary<string, object>();
     private bool wasDeclared;
 
-    internal DeclareQueue(IBunny bunny, string name) {
+    public DeclareQueue(IBunny bunny, string name) {
       this.Name = name;
       this.Bunny = bunny;
     }
 
     private bool? Durable { get; set; } = false;
-    internal (string ex, string rKey)? BindingKey { get; set; }
+    public (string ex, string rKey)? BindingKey { get; set; }
     private bool? AutoDelete { get; set; }
     public IBunny Bunny { get; set; }
     public string Name { get; }

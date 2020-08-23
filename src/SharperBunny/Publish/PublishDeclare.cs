@@ -12,18 +12,43 @@ namespace SharperBunny.Publish {
 
   public class DeclarePublisher<T> : IPublish<T>
     where T : class {
-    internal DeclarePublisher(IBunny bunny, string publishTo) {
+    private readonly IBunny bunny;
+    private readonly PermanentChannel thisChannel;
+    private readonly string publishTo;
+    
+    private Func<T, byte[]> serialize;
+    private bool Mandatory { get; set; }
+    private bool ConfirmActivated { get; set; }
+    private bool Persistent { get; set; }
+    private int? Expires { get; set; }
+
+    private string RoutingKey {
+      get {
+        if (this.routingKey != null) {
+          return this.routingKey;
+        }
+
+        return this.queueDeclare != null ? this.queueDeclare.RoutingKey : typeof(T).FullName;
+      }
+    }
+
+    private string routingKey;
+    private bool uniqueChannel;
+    private IQueue queueDeclare;
+    private bool useConfirm;
+    private Func<BasicReturnEventArgs, Task> returnCallback = context => Task.CompletedTask;
+    private Func<BasicAckEventArgs, Task> ackCallback = context => Task.CompletedTask;
+    private Func<BasicNackEventArgs, Task> nackCallback = context => Task.CompletedTask;
+    
+    public DeclarePublisher(IBunny bunny, string publishTo) {
       this.bunny = bunny;
       this.publishTo = publishTo;
       this.serialize = Config.Serialize;
       this.thisChannel = new PermanentChannel(bunny);
     }
 
-    #region Send
-
     public virtual async Task<OperationResult<T>> SendAsync(T msg, bool force = false) {
-      var operationResult = new OperationResult<T>();
-      operationResult.Message = msg;
+      var operationResult = new OperationResult<T> { Message = msg };
       IModel channel = null;
       try {
         channel = this.thisChannel.Channel;
@@ -69,48 +94,6 @@ namespace SharperBunny.Publish {
       return operationResult;
     }
 
-    #endregion
-
-    #region immutable fields
-
-    private readonly IBunny bunny;
-    private readonly PermanentChannel thisChannel;
-    private readonly string publishTo;
-
-    #endregion
-
-    #region mutable fields
-
-    private Func<T, byte[]> serialize;
-    private bool Mandatory { get; set; }
-    private bool ConfirmActivated { get; set; }
-    private bool Persistent { get; set; }
-    private int? Expires { get; set; }
-
-    private string RoutingKey {
-      get {
-        if (this.routingKey != null) {
-          return this.routingKey;
-        }
-
-        if (this.queueDeclare != null) {
-          return this.queueDeclare.RoutingKey;
-        }
-
-        return typeof(T).FullName;
-      }
-    }
-
-    private string routingKey;
-    private bool uniqueChannel;
-    private IQueue queueDeclare;
-    private bool useConfirm;
-    private Func<BasicReturnEventArgs, Task> returnCallback = context => Task.CompletedTask;
-    private Func<BasicAckEventArgs, Task> ackCallback = context => Task.CompletedTask;
-    private Func<BasicNackEventArgs, Task> nackCallback = context => Task.CompletedTask;
-
-    #endregion
-
     #region PublisherConfirm
 
     private void Handlers(IModel channel, bool dismantle = false) {
@@ -122,14 +105,16 @@ namespace SharperBunny.Publish {
         }
       }
 
-      if (this.useConfirm) {
-        if (dismantle) {
-          channel.BasicNacks -= this.HandleNack;
-          channel.BasicAcks -= this.HandleAck;
-        } else {
-          channel.BasicNacks += this.HandleNack;
-          channel.BasicAcks += this.HandleAck;
-        }
+      if (!this.useConfirm) {
+        return;
+      }
+
+      if (dismantle) {
+        channel.BasicNacks -= this.HandleNack;
+        channel.BasicAcks -= this.HandleAck;
+      } else {
+        channel.BasicNacks += this.HandleNack;
+        channel.BasicAcks += this.HandleAck;
       }
     }
 
@@ -186,8 +171,8 @@ namespace SharperBunny.Publish {
       return this;
     }
 
-    public IPublish<T> WithExpire(uint expire) {
-      this.Expires = (int)expire;
+    public IPublish<T> WithExpire(int expire) {
+      this.Expires = expire;
       return this;
     }
 

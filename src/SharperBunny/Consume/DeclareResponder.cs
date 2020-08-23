@@ -3,7 +3,6 @@ namespace SharperBunny.Consume {
   using System.Threading.Tasks;
   using SharperBunny.Configuration;
   using SharperBunny.Connection;
-  using SharperBunny.Declare;
   using SharperBunny.Exceptions;
   using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
@@ -14,13 +13,20 @@ namespace SharperBunny.Consume {
     public const string directReplyTo = "amq.rabbitmq.reply-to";
     private const string defaultExchange = "";
 
-    public DeclareResponder(IBunny bunny, string rpcExchange, string fromQueue, Func<TRequest, Task<TResponse>> respond) {
-      if (respond == null) {
-        throw DeclarationException.Argument(new ArgumentException("respond delegate must not be null"));
-      }
+    private readonly IBunny bunny;
+    private readonly string rpcExchange;
+    private readonly string consumeFromQueue;
+    private readonly PermanentChannel thisChannel;
 
+    private bool useTempQueue;
+    private bool useUniqueChannel;
+    private Func<ReadOnlyMemory<byte>, TRequest> deserialize;
+    private Func<TResponse, byte[]> serialize;
+    private readonly Func<TRequest, Task<TResponse>> respond;
+
+    public DeclareResponder(IBunny bunny, string rpcExchange, string fromQueue, Func<TRequest, Task<TResponse>> respond) {
       this.bunny = bunny;
-      this.respond = respond;
+      this.respond = respond ?? throw DeclarationException.Argument(new ArgumentException("respond delegate must not be null"));
       this.rpcExchange = rpcExchange;
       this.serialize = Config.Serialize;
       this.consumeFromQueue = fromQueue;
@@ -58,7 +64,7 @@ namespace SharperBunny.Consume {
       var consumeResult = await this.bunny.Consumer<TRequest>(this.consumeFromQueue)
                             .DeserializeMessage(this.deserialize)
                             .Callback(receiver)
-                            .StartConsumingAsync(forceDeclare);
+                            .StartConsuming(forceDeclare);
 
       if (consumeResult.IsSuccess) {
         result.IsSuccess = true;
@@ -71,27 +77,6 @@ namespace SharperBunny.Consume {
 
       return result;
     }
-
-    #region immutable fields
-
-    private readonly IBunny bunny;
-    private readonly string rpcExchange;
-    private readonly string consumeFromQueue;
-    private readonly PermanentChannel thisChannel;
-
-    #endregion
-
-    #region mutable fields
-
-    private bool useTempQueue;
-    private bool useUniqueChannel;
-    private Func<ReadOnlyMemory<byte>, TRequest> deserialize;
-    private Func<TResponse, byte[]> serialize;
-    private readonly Func<TRequest, Task<TResponse>> respond;
-
-    #endregion
-
-    #region declarations
 
     public IRespond<TRequest, TResponse> WithSerialize(Func<TResponse, byte[]> serialize) {
       this.serialize = serialize;
@@ -108,26 +93,22 @@ namespace SharperBunny.Consume {
       return this;
     }
 
-    #endregion
-
-    #region IDisposable Support
-
     private bool disposedValue;
 
     protected virtual void Dispose(bool disposing) {
-      if (!this.disposedValue) {
-        if (disposing) {
-          this.thisChannel.Dispose();
-        }
-
-        this.disposedValue = true;
+      if (this.disposedValue) {
+        return;
       }
+
+      if (disposing) {
+        this.thisChannel.Dispose();
+      }
+
+      this.disposedValue = true;
     }
 
     public void Dispose() {
       this.Dispose(true);
     }
-
-    #endregion
   }
 }

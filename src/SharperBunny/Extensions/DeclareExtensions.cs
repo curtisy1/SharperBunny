@@ -1,29 +1,24 @@
-namespace SharperBunny.Declare {
+namespace SharperBunny.Extensions {
   using System;
   using System.Threading.Tasks;
   using RabbitMQ.Client;
+  using SharperBunny.Declare;
   using SharperBunny.Exceptions;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
-  public static class DeclareQueueExtensions {
-    #region Checks
-
+  public static class DeclareExtensions {
     private static IBunny CheckGetBunny(IDeclare declare, string toCheck, string errorPrefix) {
       if (string.IsNullOrWhiteSpace(toCheck)) {
-        var arg = new ArgumentException($"{errorPrefix}-name must not be null-or-whitespace");
-        throw DeclarationException.Argument(arg);
+        throw DeclarationException.Argument(new ArgumentException($"{errorPrefix}-name must not be null-or-whitespace"));
       }
 
-      if (toCheck.Length > 255) {
-        var arg = new ArgumentException($"{errorPrefix}-length must be less than or equal to 255 character");
-        throw DeclarationException.Argument(arg);
+      if (toCheck.Length <= 255) {
+        return declare.Bunny;
       }
 
-      return declare.Bunny;
+      throw DeclarationException.Argument(new ArgumentException($"{errorPrefix}-length must be less than or equal to 255 characters"));
     }
 
-    #endregion
 
     private static async Task<bool> ExecuteOnChannelAsync(IBunny bunny, Action<IModel> execute) {
       IModel channel = null;
@@ -34,11 +29,10 @@ namespace SharperBunny.Declare {
       } catch {
         return false;
       } finally {
-        channel.Close();
+        channel?.Close();
       }
     }
 
-    #region Queue
 
     /// <summary>
     ///   Enter Queue DeclarationMode
@@ -67,9 +61,6 @@ namespace SharperBunny.Declare {
       return bunny.QueueExistsAsync(queue);
     }
 
-    #endregion
-
-    #region Exchange
 
     public static IExchange Exchange(this IDeclare declare, string exchangeName, string type = "direct") {
       var @base = CheckGetBunny(declare, exchangeName, "exchange");
@@ -85,7 +76,5 @@ namespace SharperBunny.Declare {
       var bunny = CheckGetBunny(declare, exchangeName, "exchange");
       return bunny.ExchangeExistsAsync(exchangeName);
     }
-
-    #endregion
   }
 }

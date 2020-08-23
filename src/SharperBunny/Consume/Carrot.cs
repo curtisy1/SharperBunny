@@ -20,37 +20,34 @@ namespace SharperBunny.Consume {
 
     public IBasicProperties MessageProperties { get; set; }
 
-    public async Task<OperationResult<TMsg>> SendAckAsync(bool multiple = false) {
+    public Task<OperationResult<TMsg>> SendAck(bool multiple = false) {
       var result = new OperationResult<TMsg>();
       try {
-        await Task.Run(() => this.thisChannel.Channel.BasicAck(this.DeliveryTag, multiple));
+        this.thisChannel.Channel.BasicAck(this.DeliveryTag, multiple);
         result.IsSuccess = true;
         result.State = OperationState.Acked;
-        return result;
       } catch (Exception ex) {
         result.Error = ex;
         result.IsSuccess = false;
         result.State = OperationState.Failed;
       }
 
-      return result;
+      return Task.FromResult(result);
     }
 
-    public async Task<OperationResult<TMsg>> SendNackAsync(bool multiple = false, bool withRequeue = true) {
+    public Task<OperationResult<TMsg>> SendNack(bool multiple = false, bool withRequeue = true) {
       var result = new OperationResult<TMsg>();
       try {
-        await Task.Run(() => this.thisChannel.Channel.BasicNack(this.DeliveryTag, multiple, withRequeue));
+        this.thisChannel.Channel.BasicNack(this.DeliveryTag, multiple, withRequeue);
         result.IsSuccess = true;
         result.State = OperationState.Nacked;
-
-        return result;
       } catch (Exception ex) {
         result.IsSuccess = false;
         result.Error = ex;
         result.State = OperationState.Failed;
       }
 
-      return result;
+      return Task.FromResult(result);
     }
   }
 }

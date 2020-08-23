@@ -21,10 +21,10 @@ namespace SharperBunny.Extensions {
     /// <summary>
     ///   Create a Consumer to subscribe to a Queue. If no queue is specified the Queue Name will be AssemblyName.TypeName
     /// </summary>
-    public static IConsume<TMsg> Consumer<TMsg>(this IBunny bunny, string fromQueue = null) {
+    public static Consumer<TMsg> Consumer<TMsg>(this IBunny bunny, string fromQueue = null) {
       fromQueue ??= SerializeTypeName<TMsg>();
 
-      return new DeclareConsumer<TMsg>(bunny, fromQueue);
+      return new Consumer<TMsg>(bunny, fromQueue);
     }
 
     /// <summary>
