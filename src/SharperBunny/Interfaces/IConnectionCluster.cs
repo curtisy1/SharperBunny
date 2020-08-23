@@ -25,6 +25,8 @@ namespace SharperBunny.Interfaces {
     /// </summary>
     IConnectionCluster WithRetries(int retry = 5, int timeout = 2);
 
+    IConnectionCluster UseAsyncEvents(bool useAsync = true);
+
     IBunny Connect();
   }
 }

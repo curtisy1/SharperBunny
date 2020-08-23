@@ -68,7 +68,7 @@ namespace SharperBunny.Tests.Declaration {
         .WithTtl(500)
         .MaxLength(10);
 
-      await declare.Declare();
+      declare.Declare();
 
       Assert.Equal(1, 1);
     }
@@ -76,7 +76,7 @@ namespace SharperBunny.Tests.Declaration {
     private class PurposeIsFail : IDeclare {
       public IBunny Bunny => throw new NotImplementedException();
 
-      public Task Declare() {
+      public void Declare() {
         throw new NotImplementedException();
       }
     }

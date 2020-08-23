@@ -11,6 +11,7 @@ namespace SharperBunny {
   using SharperBunny.Interfaces;
 
   public static class Bunny {
+    internal static bool UseAsyncEvents { get; set; }
     internal static int RetryCount { get; set; } = 3;
     internal static int RetryPauseInMs { get; set; } = 1500;
 
@@ -19,18 +20,20 @@ namespace SharperBunny {
     /// <summary>
     ///   Create a permanent connection by using parameters.
     /// </summary>
-    public static IBunny ConnectSingle(ConnectionParameters parameters) {
+    public static IBunny ConnectSingle(ConnectionParameters parameters, bool useAsync = false) {
       Endpoints.Clear();
       Endpoints.Add(parameters.ToString().ParseEndpoint());
+      UseAsyncEvents = useAsync;
       return Connect();
     }
 
     /// <summary>
     ///   Create a permanent connection by using an amqp_uri.
     /// </summary>
-    public static IBunny ConnectSingle(string amqpUri) {
+    public static IBunny ConnectSingle(string amqpUri, bool useAsync = false) {
       Endpoints.Clear();
       Endpoints.Add(amqpUri.ParseEndpoint());
+      UseAsyncEvents = useAsync;
       return Connect();
     }
 
@@ -49,7 +52,7 @@ namespace SharperBunny {
     }
 
     internal static IBunny Connect() {
-      var factory = new ConnectionFactory();
+      var factory = new ConnectionFactory { DispatchConsumersAsync = UseAsyncEvents };
       var count = 0;
       while (count <= RetryCount) {
         try {

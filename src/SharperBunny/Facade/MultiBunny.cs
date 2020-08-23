@@ -11,7 +11,9 @@ namespace SharperBunny.Facade {
     private readonly IList<AmqpTcpEndpoint> endpoints;
     private readonly IConnectionFactory factory;
     private readonly List<IModel> models = new List<IModel>();
+    
     private IConnection connection;
+    private bool disposedValue;
 
     public MultiBunny(IConnectionFactory factory, IList<AmqpTcpEndpoint> endpoints) {
       this.factory = factory;
@@ -47,11 +49,7 @@ namespace SharperBunny.Facade {
         this.connection = this.factory.CreateConnection(this.endpoints);
       }
     }
-
-    #region IDisposable Support
-
-    private bool disposedValue; // To detect redundant calls
-
+    
     protected virtual void Dispose(bool disposing) {
       if (this.disposedValue) {
         return;
@@ -70,7 +68,5 @@ namespace SharperBunny.Facade {
     public void Dispose() {
       this.Dispose(true);
     }
-
-    #endregion
   }
 }

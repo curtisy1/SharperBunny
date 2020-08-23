@@ -13,11 +13,11 @@ namespace SharperBunny.Tests.Declaration {
       var declare = bunny.Setup()
         .Queue("to-delete");
 
-      await declare.Declare();
-      var exists = await declare.QueueExistsAsync(declare.Name);
+      declare.Declare();
+      var exists = declare.QueueExists(declare.Name);
       Assert.True(exists);
-      await declare.DeleteQueueAsync(declare.Name);
-      exists = await declare.QueueExistsAsync(declare.Name);
+      declare.DeleteQueue(declare.Name);
+      exists = declare.QueueExists(declare.Name);
       Assert.False(exists);
     }
 
@@ -27,11 +27,11 @@ namespace SharperBunny.Tests.Declaration {
       var declare = bunny.Setup()
         .Exchange("to-delete-ex", "fanout");
 
-      await declare.Declare();
-      var exists = await declare.ExchangeExistsAsync(declare.Name);
+      declare.Declare();
+      var exists = declare.ExchangeExists(declare.Name);
       Assert.True(exists);
-      await declare.DeleteExchangeAsync(declare.Name);
-      exists = await declare.ExchangeExistsAsync(declare.Name);
+      declare.DeleteExchange(declare.Name);
+      exists = declare.ExchangeExists(declare.Name);
       Assert.False(exists);
     }
   }

@@ -3,6 +3,10 @@ namespace SharperBunny.Interfaces {
   using System.Threading.Tasks;
   using RabbitMQ.Client;
 
+  public interface IConsumerWrapper<TConsumer> {
+    
+  }
+
   /// <summary>
   ///   Define a Consumer and its traits. Use StartConsume for Push API or Get for Pull API.
   /// </summary>

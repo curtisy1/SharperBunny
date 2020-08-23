@@ -58,9 +58,9 @@ namespace SharperBunny.Declare {
       return this;
     }
 
-    public IQueue Bind(string exchangeName, string routingKey) {
-      if (exchangeName == null || string.IsNullOrWhiteSpace(routingKey)) {
-        throw DeclarationException.Argument(new ArgumentException("exchangename must not be null and routingKey must not be Null, Empty or Whitespace"));
+    public IQueue Bind(string exchangeName, string routingKey = "") {
+      if (exchangeName == null) {
+        throw DeclarationException.Argument(new ArgumentException("exchangename must not be null"));
       }
 
       this.BindingKey = (exchangeName, routingKey);

@@ -33,7 +33,7 @@ namespace SharperBunny.Interfaces {
     ///   THe OperationResult tells you if the message was routed successfully. For full message reliability activate
     ///   AsMandatory as well as WithConfirm and handle the respective events.
     /// </summary>
-    Task<OperationResult<T>> SendAsync(T message, bool force = false);
+    OperationResult<T> Send(T message, bool force = false);
 
     IPublish<T> WithSerialize(Func<T, byte[]> serialize);
 

@@ -57,6 +57,11 @@ namespace SharperBunny.Connection {
       return this; 
     }
 
+    public IConnectionPipe UseAsyncEvents(bool useAsync = true) {
+      Bunny.UseAsyncEvents = useAsync;
+      return this;
+    }
+
     public string ToString(string format, IFormatProvider formatProvider) {
       var result = $"amqp://{this.user}:{this.password}@{this.host}:{this.port}/{this.vHost}";
       return result;

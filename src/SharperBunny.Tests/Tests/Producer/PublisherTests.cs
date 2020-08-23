@@ -16,7 +16,7 @@ namespace SharperBunny.Tests.Producer {
       var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
       var publisher = bunny.Publisher<TestMessage>(this.exchange);
 
-      var result = await publisher.SendAsync(new TestMessage());
+      var result = publisher.Send(new TestMessage());
 
       Assert.True(result.IsSuccess);
       bunny.Dispose();
@@ -27,11 +27,11 @@ namespace SharperBunny.Tests.Producer {
       var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
       var publisher = bunny.Publisher<TestMessage>(this.exchange);
 
-      var result = await publisher
+      var result = publisher
                      .WithQueueDeclare()
-                     .SendAsync(new TestMessage());
+                     .Send(new TestMessage());
 
-      var success = await bunny.Setup().DeleteQueueAsync(typeof(TestMessage).FullName, force: true);
+      var success = bunny.Setup().DeleteQueue(typeof(TestMessage).FullName, force: true);
 
       Assert.True(result.IsSuccess);
       Assert.True(success);
@@ -43,10 +43,10 @@ namespace SharperBunny.Tests.Producer {
       var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
       var publisher = bunny.Publisher<TestMessage>("test-exchange");
 
-      var result = await publisher.SendAsync(new TestMessage(), true);
+      var result = publisher.Send(new TestMessage(), true);
 
       Assert.True(result.IsSuccess);
-      var removedExchange = await bunny.Setup().DeleteExchangeAsync("test-exchange", force: true);
+      var removedExchange = bunny.Setup().DeleteExchange("test-exchange", force: true);
       Assert.True(removedExchange);
       bunny.Dispose();
     }
@@ -73,14 +73,14 @@ namespace SharperBunny.Tests.Producer {
         return Task.CompletedTask;
       };
 
-      await publisher.WithQueueDeclare(queue)
+      publisher.WithQueueDeclare(queue)
         .WithConfirm(acker, nacker)
         .WithRoutingKey("constraint-key")
-        .SendAsync(new TestMessage { Text = "Confirm-1st" });
+        .Send(new TestMessage { Text = "Confirm-1st" });
 
-      await publisher.WithQueueDeclare(queue)
+      publisher.WithQueueDeclare(queue)
         .WithConfirm(acker, nacker)
-        .SendAsync(new TestMessage { Text = "Confirm-2nd" });
+        .Send(new TestMessage { Text = "Confirm-2nd" });
 
       Assert.True(isAcked);
       Assert.True(isNacked);
@@ -98,9 +98,9 @@ namespace SharperBunny.Tests.Producer {
         return Task.CompletedTask;
       };
 
-      await publisher.AsMandatory(nacker)
+      publisher.AsMandatory(nacker)
         .WithRoutingKey("not-any-bound-queue")
-        .SendAsync(new TestMessage());
+        .Send(new TestMessage());
 
       await Task.Delay(500);
       Assert.True(isReturned);
@@ -118,11 +118,11 @@ namespace SharperBunny.Tests.Producer {
         return Task.CompletedTask;
       };
 
-      await publisher.AsMandatory(nacker)
+      publisher.AsMandatory(nacker)
         .WithQueueDeclare()
-        .SendAsync(new TestMessage { Text = "Mandatory-succeeds" });
+        .Send(new TestMessage { Text = "Mandatory-succeeds" });
 
-      var removed = await bunny.Setup().DeleteQueueAsync(typeof(TestMessage).FullName, force: true);
+      var removed = bunny.Setup().DeleteQueue(typeof(TestMessage).FullName, force: true);
 
       Assert.True(isReturned);
       bunny.Dispose();
@@ -134,14 +134,14 @@ namespace SharperBunny.Tests.Producer {
       var publisher = bunny.Publisher<TestMessage>("amq.direct");
 
       var queueName = "polymorph-queue";
-      await publisher.WithQueueDeclare(queueName, "poly")
-        .SendAsync(new OtherMessage());
-      await publisher.SendAsync(new YetAnotherMessage());
+      publisher.WithQueueDeclare(queueName, "poly")
+        .Send(new OtherMessage());
+      publisher.Send(new YetAnotherMessage());
       await Task.Delay(150);
       var count = bunny.Channel().MessageCount(queueName);
 
       Assert.Equal(2, (int)count);
-      await bunny.Setup().DeleteQueueAsync(queueName, force: true);
+      bunny.Setup().DeleteQueue(queueName, force: true);
     }
 
     [Fact]
@@ -151,11 +151,11 @@ namespace SharperBunny.Tests.Producer {
 
       var queueName = "polymorph-queue-other";
       var queueNameYetOther = "polymorph-queue-yet-another";
-      await publisher.WithQueueDeclare(queueName, "poly")
-        .SendAsync(new OtherMessage());
-      await publisher.WithQueueDeclare(queueNameYetOther, "poly-2")
+      publisher.WithQueueDeclare(queueName, "poly")
+        .Send(new OtherMessage());
+      publisher.WithQueueDeclare(queueNameYetOther, "poly-2")
         .WithRoutingKey("poly-2")
-        .SendAsync(new YetAnotherMessage());
+        .Send(new YetAnotherMessage());
 
       var otherCount = bunny.Channel().MessageCount(queueName);
       var yetOtherCount = bunny.Channel().MessageCount(queueNameYetOther);
@@ -163,8 +163,8 @@ namespace SharperBunny.Tests.Producer {
       Assert.Equal(1, (int)otherCount);
       Assert.Equal(1, (int)yetOtherCount);
 
-      await bunny.Setup().DeleteQueueAsync(queueName, force: true);
-      await bunny.Setup().DeleteQueueAsync(queueNameYetOther, force: true);
+      bunny.Setup().DeleteQueue(queueName, force: true);
+      bunny.Setup().DeleteQueue(queueNameYetOther, force: true);
     }
 
     public class TestMessage {

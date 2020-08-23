@@ -22,9 +22,9 @@ namespace SharperBunny.Consume {
     private bool useUniqueChannel;
     private Func<ReadOnlyMemory<byte>, TRequest> deserialize;
     private Func<TResponse, byte[]> serialize;
-    private readonly Func<TRequest, Task<TResponse>> respond;
+    private readonly Func<TRequest, TResponse> respond;
 
-    public DeclareResponder(IBunny bunny, string rpcExchange, string fromQueue, Func<TRequest, Task<TResponse>> respond) {
+    public DeclareResponder(IBunny bunny, string rpcExchange, string fromQueue, Func<TRequest, TResponse> respond) {
       this.bunny = bunny;
       this.respond = respond ?? throw DeclarationException.Argument(new ArgumentException("respond delegate must not be null"));
       this.rpcExchange = rpcExchange;
@@ -41,14 +41,14 @@ namespace SharperBunny.Consume {
 
       publisher.UseUniqueChannel(this.useUniqueChannel);
 
-      async Task Receiver(ICarrot<TRequest> carrot) {
+      void Receiver(ICarrot<TRequest> carrot) {
         var request = carrot.Message;
         try {
-          var response = await this.respond(request);
+          var response = this.respond(request);
           var replyTo = carrot.MessageProperties.ReplyTo;
 
           publisher.WithRoutingKey(replyTo);
-          result = await publisher.SendAsync(response);
+          result = publisher.Send(response);
         } catch (Exception ex) {
           result.IsSuccess = false;
           result.State = OperationState.RpcReplyFailed;
@@ -62,7 +62,7 @@ namespace SharperBunny.Consume {
         .AsDurable()
         .Bind(this.rpcExchange, this.consumeFromQueue);
 
-      var consumeResult = await this.bunny.AsyncConsumer<TRequest>(this.consumeFromQueue)
+      var consumeResult = this.bunny.Consumer<TRequest>(this.consumeFromQueue)
                             .DeserializeMessage(this.deserialize)
                             .Callback(Receiver)
                             .StartConsuming(forceDeclare);

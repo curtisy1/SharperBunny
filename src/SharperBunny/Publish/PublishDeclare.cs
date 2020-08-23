@@ -5,7 +5,6 @@ namespace SharperBunny.Publish {
   using RabbitMQ.Client.Events;
   using SharperBunny.Configuration;
   using SharperBunny.Connection;
-  using SharperBunny.Declare;
   using SharperBunny.Exceptions;
   using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
@@ -15,7 +14,7 @@ namespace SharperBunny.Publish {
     private readonly IBunny bunny;
     private readonly PermanentChannel thisChannel;
     private readonly string publishTo;
-    
+
     private Func<T, byte[]> serialize;
     private bool Mandatory { get; set; }
     private bool ConfirmActivated { get; set; }
@@ -39,7 +38,8 @@ namespace SharperBunny.Publish {
     private Func<BasicReturnEventArgs, Task> returnCallback = context => Task.CompletedTask;
     private Func<BasicAckEventArgs, Task> ackCallback = context => Task.CompletedTask;
     private Func<BasicNackEventArgs, Task> nackCallback = context => Task.CompletedTask;
-    
+    private bool disposedValue;
+
     public DeclarePublisher(IBunny bunny, string publishTo) {
       this.bunny = bunny;
       this.publishTo = publishTo;
@@ -47,7 +47,7 @@ namespace SharperBunny.Publish {
       this.thisChannel = new PermanentChannel(bunny);
     }
 
-    public virtual async Task<OperationResult<T>> SendAsync(T msg, bool force = false) {
+    public virtual OperationResult<T> Send(T msg, bool force = false) {
       var operationResult = new OperationResult<T> { Message = msg };
       IModel channel = null;
       try {
@@ -65,16 +65,14 @@ namespace SharperBunny.Publish {
             .Declare();
         }
 
-        await Task.Run(() => {
-          if (this.useConfirm) {
-            channel.ConfirmSelect();
-          }
+        if (this.useConfirm) {
+          channel.ConfirmSelect();
+        }
 
-          channel.BasicPublish(this.publishTo, this.RoutingKey, this.Mandatory, properties, this.serialize(msg));
-          if (this.useConfirm) {
-            channel.WaitForConfirmsOrDie();
-          }
-        });
+        channel.BasicPublish(this.publishTo, this.RoutingKey, this.Mandatory, properties, this.serialize(msg));
+        if (this.useConfirm) {
+          channel.WaitForConfirmsOrDie();
+        }
 
         operationResult.IsSuccess = true;
         operationResult.State = OperationState.Published;
@@ -91,8 +89,6 @@ namespace SharperBunny.Publish {
 
       return operationResult;
     }
-
-    #region PublisherConfirm
 
     private void Handlers(IModel channel, bool dismantle = false) {
       if (this.Mandatory) {
@@ -142,10 +138,6 @@ namespace SharperBunny.Publish {
 
       return basicProperties;
     }
-
-    #endregion
-
-    #region Declarations
 
     public IPublish<T> AsMandatory(Func<BasicReturnEventArgs, Task> onReturn) {
       this.returnCallback = onReturn;
@@ -201,12 +193,6 @@ namespace SharperBunny.Publish {
       return this;
     }
 
-    #endregion
-
-    #region IDisposable Support
-
-    private bool disposedValue; // To detect redundant calls
-
     protected virtual void Dispose(bool disposing) {
       if (!this.disposedValue) {
         if (disposing) {
@@ -221,7 +207,5 @@ namespace SharperBunny.Publish {
     public void Dispose() {
       this.Dispose(true);
     }
-
-    #endregion
   }
 }

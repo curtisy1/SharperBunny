@@ -19,6 +19,8 @@ namespace SharperBunny.Interfaces {
 
     IConnectionPipe WithRetries(int retries, int timeout);
 
+    IConnectionPipe UseAsyncEvents(bool useAsync = true);
+
     IBunny Connect();
   }
 }

@@ -6,9 +6,9 @@ namespace SharperBunny.Consume {
 
   public class AsyncConsumer<TMsg> : ConsumerBase<TMsg>, IAsyncConsumer<TMsg> {
     private AsyncEventingBasicConsumer consumer;
-    private Func<ICarrot<TMsg>, Task> receive;
-    private Func<ICarrot<TMsg>, Task> ackBehaviour;
-    private Func<ICarrot<TMsg>, Task> nackBehaviour;
+    private Func<IAsyncCarrot<TMsg>, Task> receive;
+    private Func<IAsyncCarrot<TMsg>, Task> ackBehaviour;
+    private Func<IAsyncCarrot<TMsg>, Task> nackBehaviour;
     private Func<ReadOnlyMemory<byte>, TMsg> deserialize;
 
     public AsyncConsumer(IBunny bunny, string fromQueue) : base(bunny, fromQueue) {
@@ -58,14 +58,14 @@ namespace SharperBunny.Consume {
       return Task.FromResult(result);
     }
 
-    public async Task<OperationResult<TMsg>> Get(Func<ICarrot<TMsg>, Task> handle) {
+    public async Task<OperationResult<TMsg>> Get(Func<IAsyncCarrot<TMsg>, Task> handle) {
       var operationResult = new OperationResult<TMsg>();
 
       try {
         var result = this.thisChannel.Channel.BasicGet(this.consumeFromQueue, this.autoAck);
         if (result != null) {
           var msg = this.deserialize(result.Body);
-          var carrot = new Carrot<TMsg>(msg, result.DeliveryTag, this.thisChannel);
+          var carrot = new AsyncCarrot<TMsg>(msg, result.DeliveryTag, this.thisChannel);
           await handle(carrot);
           operationResult.IsSuccess = true;
           operationResult.State = OperationState.Get;
@@ -82,18 +82,18 @@ namespace SharperBunny.Consume {
       return operationResult;
     }
 
-    public IAsyncConsumer<TMsg> Callback(Func<ICarrot<TMsg>, Task> callback) {
+    public IAsyncConsumer<TMsg> Callback(Func<IAsyncCarrot<TMsg>, Task> callback) {
       this.receive = callback;
       return this;
     }
 
-    public IAsyncConsumer<TMsg> AckBehaviour(Func<ICarrot<TMsg>, Task> ackBehaviour) {
+    public IAsyncConsumer<TMsg> AckBehaviour(Func<IAsyncCarrot<TMsg>, Task> ackBehaviour) {
       this.autoAck = false;
       this.ackBehaviour = ackBehaviour;
       return this;
     }
 
-    public IAsyncConsumer<TMsg> NackBehaviour(Func<ICarrot<TMsg>, Task> nackBehaviour) {
+    public IAsyncConsumer<TMsg> NackBehaviour(Func<IAsyncCarrot<TMsg>, Task> nackBehaviour) {
       this.nackBehaviour = nackBehaviour;
       return this;
     }
@@ -127,10 +127,10 @@ namespace SharperBunny.Consume {
     }
 
     private async Task HandleReceived(object channel, BasicDeliverEventArgs args) {
-      Carrot<TMsg> carrot = null;
+      AsyncCarrot<TMsg> carrot = null;
       try {
         var message = this.deserialize(args.Body);
-        carrot = new Carrot<TMsg>(message, args.DeliveryTag, this.thisChannel) { MessageProperties = args.BasicProperties };
+        carrot = new AsyncCarrot<TMsg>(message, args.DeliveryTag, this.thisChannel) { MessageProperties = args.BasicProperties };
 
         await this.receive(carrot);
         if (this.autoAck == false) {

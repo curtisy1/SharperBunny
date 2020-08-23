@@ -27,9 +27,14 @@ namespace SharperBunny.Connection {
       return Bunny.Connect();
     }
 
-    public IConnectionCluster WithRetries(int retry = 5, int timeout = 2) {
+    public IConnectionCluster WithRetries(int retry = 5, int timeout = 1500) {
       Bunny.RetryCount = retry;
       Bunny.RetryPauseInMs = timeout;
+      return this;
+    }
+
+    public IConnectionCluster UseAsyncEvents(bool useAsync = true) {
+      Bunny.UseAsyncEvents = useAsync;
       return this;
     }
   }

@@ -50,7 +50,7 @@ namespace SharperBunny.Extensions {
     /// <summary>
     ///   Other side of the Rpc Call. Consumes fromQueue. If not Specified does consume from AssemblyName.TypeName
     /// </summary>
-    public static IRespond<TRequest, TResponse> Respond<TRequest, TResponse>(this IBunny bunny, string rpcExchange, Func<TRequest, Task<TResponse>> respond, string fromQueue = null)
+    public static IRespond<TRequest, TResponse> Respond<TRequest, TResponse>(this IBunny bunny, string rpcExchange, Func<TRequest, TResponse> respond, string fromQueue = null)
       where TRequest : class
       where TResponse : class {
       fromQueue ??= SerializeTypeName<TRequest>();

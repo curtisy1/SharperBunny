@@ -11,9 +11,9 @@ namespace SharperBunny.Consume {
     private Func<ReadOnlyMemory<byte>, TMsg> deserialize;
 
     public Consumer(IBunny bunny, string fromQueue) : base(bunny, fromQueue) {
-      this.receive = async carrot => await carrot.SendAck();
-      this.ackBehaviour = async carrot => await carrot.SendAck();
-      this.nackBehaviour = async carrot => await carrot.SendNack(withRequeue: true);
+      this.receive = carrot => carrot.SendAck();
+      this.ackBehaviour = carrot => carrot.SendAck();
+      this.nackBehaviour = carrot => carrot.SendNack(withRequeue: true);
     }
 
     public IConsumer<TMsg> Callback(Action<ICarrot<TMsg>> callback) {

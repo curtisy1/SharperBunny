@@ -14,6 +14,20 @@ namespace SharperBunny.Publish {
     where TRequest : class
     where TResponse : class {
     public const string directReplyTo = "amq.rabbitmq.reply-to";
+    
+    private readonly IBunny bunny;
+    private readonly string toExchange;
+    private readonly string routingKey;
+    private readonly PermanentChannel thisChannel;
+    
+    private int timeOut = 1500;
+    private Func<ReadOnlyMemory<byte>, TResponse> deserialize;
+    private Func<TRequest, byte[]> serialize;
+    private bool useTempQueue;
+    private bool useUniqueChannel;
+    private IQueue queueDeclare;
+    private string RoutingKey => this.queueDeclare != null ? this.queueDeclare.RoutingKey : this.routingKey;
+    private bool disposedValue;
 
     internal DeclareRequest(IBunny bunny, string toExchange, string routingKey) {
       this.bunny = bunny;
@@ -24,10 +38,9 @@ namespace SharperBunny.Publish {
       this.thisChannel = new PermanentChannel(this.bunny);
     }
 
-    public async Task<OperationResult<TResponse>> RequestAsync(TRequest request, bool force = false) {
+    public OperationResult<TResponse> Request(TRequest request, bool force = false) {
       var bytes = this.serialize(request);
       var result = new OperationResult<TResponse>();
-      var mre = new ManualResetEvent(false);
 
       var channel = this.thisChannel.Channel;
       if (force) {
@@ -41,11 +54,10 @@ namespace SharperBunny.Publish {
       var correlationId = Guid.NewGuid().ToString();
 
       var replyTo = this.useTempQueue ? channel.QueueDeclare().QueueName : directReplyTo;
-      result = await this.ConsumeAsync(channel, replyTo, result, mre, correlationId);
+      result = this.Consume(channel, replyTo, result);
 
       if (result.IsSuccess) {
-        result = await this.PublishAsync(channel, replyTo, bytes, result, correlationId);
-        mre.WaitOne(this.timeOut);
+        result = this.Publish(channel, replyTo, bytes, result, correlationId);
       }
 
       if (this.useUniqueChannel) {
@@ -55,8 +67,8 @@ namespace SharperBunny.Publish {
       return result;
     }
 
-    public IRequest<TRequest, TResponse> WithTimeOut(uint timeOut) {
-      this.timeOut = (int)timeOut;
+    public IRequest<TRequest, TResponse> WithTimeOut(int timeOut) {
+      this.timeOut = timeOut;
       return this;
     }
 
@@ -93,16 +105,15 @@ namespace SharperBunny.Publish {
       return this;
     }
 
-    private async Task<OperationResult<TResponse>> PublishAsync(IModel channel, string replyTo, byte[] payload, OperationResult<TResponse> result, string correlationId) {
-      // publish
+    private OperationResult<TResponse> Publish(IModel channel, string replyTo, byte[] payload, OperationResult<TResponse> result, string correlationId) {
       var props = channel.CreateBasicProperties();
       props.ReplyTo = replyTo;
       props.CorrelationId = correlationId;
       props.Persistent = false;
 
-      DeclarePublisher<TRequest>.ConstructProperties(props, false, 1500);
+      DeclarePublisher<TRequest>.ConstructProperties(props, false, this.timeOut);
       try {
-        await Task.Run(() => { channel.BasicPublish(this.toExchange, this.RoutingKey, false, props, payload); });
+        channel.BasicPublish(this.toExchange, this.RoutingKey, false, props, payload);
         result.IsSuccess = true;
         result.State = OperationState.RpcPublished;
       } catch (Exception ex) {
@@ -114,7 +125,7 @@ namespace SharperBunny.Publish {
       return result;
     }
 
-    private async Task<OperationResult<TResponse>> ConsumeAsync(IModel channel, string replyTo, OperationResult<TResponse> result, ManualResetEvent mre, string correlationId) {
+    private OperationResult<TResponse> Consume(IModel channel, string replyTo, OperationResult<TResponse> result) {
       var consumer = new EventingBasicConsumer(channel);
       EventHandler<BasicDeliverEventArgs> handle = null;
       var tag = $"temp-consumer {typeof(TRequest)}-{typeof(TResponse)}-{Guid.NewGuid()}";
@@ -130,22 +141,20 @@ namespace SharperBunny.Publish {
           result.IsSuccess = false;
           result.State = OperationState.ResponseFailed;
         } finally {
-          mre.Set();
           consumer.Received -= handle;
           channel.BasicCancel(tag);
-          mre.Dispose();
         }
       };
       consumer.Received += handle;
 
       try {
-        await Task.Run(() => channel.BasicConsume(replyTo,
+        channel.BasicConsume(replyTo,
                                                   true,
                                                   $"temp-consumer {typeof(TRequest)}-{typeof(TResponse)}",
                                                   false,
                                                   false,
                                                   null,
-                                                  consumer));
+                                                  consumer);
 
         result.IsSuccess = true;
         result.State = OperationState.RpcPublished;
@@ -157,55 +166,21 @@ namespace SharperBunny.Publish {
 
       return result;
     }
-
-    #region immutable fields
-
-    private readonly IBunny bunny;
-    private readonly string toExchange;
-    private readonly string routingKey;
-    private readonly PermanentChannel thisChannel;
-
-    #endregion
-
-    #region mutable fields
-
-    private int timeOut = 1500;
-    private Func<ReadOnlyMemory<byte>, TResponse> deserialize;
-    private Func<TRequest, byte[]> serialize;
-    private bool useTempQueue;
-    private bool useUniqueChannel;
-    private IQueue queueDeclare;
-
-    private string RoutingKey {
-      get {
-        if (this.queueDeclare != null) {
-          return this.queueDeclare.RoutingKey;
-        }
-
-        return this.routingKey;
-      }
-    }
-
-    #endregion
-
-    #region IDisposable Support
-
-    private bool disposedValue;
-
+    
     protected virtual void Dispose(bool disposing) {
-      if (!this.disposedValue) {
-        if (disposing) {
-          this.thisChannel.Dispose();
-        }
-
-        this.disposedValue = true;
+      if (this.disposedValue) {
+        return;
       }
+
+      if (disposing) {
+        this.thisChannel.Dispose();
+      }
+
+      this.disposedValue = true;
     }
 
     public void Dispose() {
       this.Dispose(true);
     }
-
-    #endregion
   }
 }

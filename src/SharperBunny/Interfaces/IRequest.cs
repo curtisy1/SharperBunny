@@ -31,7 +31,7 @@ namespace SharperBunny.Interfaces {
     /// <summary>
     ///   Send the Request
     /// </summary>
-    Task<OperationResult<TResponse>> RequestAsync(TRequest request, bool force = false);
+    OperationResult<TResponse> Request(TRequest request, bool force = false);
 
     /// <summary>
     ///   Specify a Deserialize function
@@ -46,6 +46,6 @@ namespace SharperBunny.Interfaces {
     /// <summary>
     ///   Specify a timeout in ms for waiting on the Response. Default is 1500 ms
     /// </summary>
-    IRequest<TRequest, TResponse> WithTimeOut(uint timeOut);
+    IRequest<TRequest, TResponse> WithTimeOut(int timeOut);
   }
 }

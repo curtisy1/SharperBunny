@@ -20,11 +20,11 @@ namespace SharperBunny.Extensions {
     }
 
 
-    private static async Task<bool> ExecuteOnChannelAsync(IBunny bunny, Action<IModel> execute) {
+    private static bool ExecuteOnChannel(IBunny bunny, Action<IModel> execute) {
       IModel channel = null;
       try {
         channel = bunny.Channel(true);
-        await Task.Run(() => execute(channel));
+        execute(channel);
         return true;
       } catch {
         return false;
@@ -46,17 +46,17 @@ namespace SharperBunny.Extensions {
       return new DeclareQueue(bunny, name);
     }
 
-    public static Task<bool> PurgeQueueAsync(this IDeclare declare, string name) {
+    public static bool PurgeQueue(this IDeclare declare, string name) {
       var bunny = CheckGetBunny(declare, name, "queue");
-      return ExecuteOnChannelAsync(bunny, model => model.QueuePurge(name));
+      return ExecuteOnChannel(bunny, model => model.QueuePurge(name));
     }
 
-    public static Task<bool> DeleteQueueAsync(this IDeclare declare, string queue, bool force = false) {
+    public static bool DeleteQueue(this IDeclare declare, string queue, bool force = false) {
       var bunny = CheckGetBunny(declare, queue, "queue");
-      return ExecuteOnChannelAsync(bunny, model => model.QueueDelete(queue, !force, !force));
+      return ExecuteOnChannel(bunny, model => model.QueueDelete(queue, !force, !force));
     }
 
-    public static bool QueueExistsAsync(this IDeclare declare, string queue) {
+    public static bool QueueExists(this IDeclare declare, string queue) {
       return CheckGetBunny(declare, queue, "queue").QueueExists(queue);
     }
 
@@ -66,12 +66,12 @@ namespace SharperBunny.Extensions {
       return new DeclareExchange(@base, exchangeName, type);
     }
 
-    public static Task<bool> DeleteExchangeAsync(this IDeclare declare, string exchangeName, bool force = false) {
+    public static bool DeleteExchange(this IDeclare declare, string exchangeName, bool force = false) {
       var bunny = CheckGetBunny(declare, exchangeName, "exchange");
-      return ExecuteOnChannelAsync(bunny, model => model.ExchangeDelete(exchangeName, !force));
+      return ExecuteOnChannel(bunny, model => model.ExchangeDelete(exchangeName, !force));
     }
 
-    public static bool ExchangeExistsAsync(this IDeclare declare, string exchangeName) {
+    public static bool ExchangeExists(this IDeclare declare, string exchangeName) {
       return CheckGetBunny(declare, exchangeName, "exchange").ExchangeExists(exchangeName);
     }
   }
