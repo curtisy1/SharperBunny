@@ -1,7 +1,7 @@
 namespace SharperBunny.Interfaces {
   using System;
 
-  public interface IConsumer<TMsg> : IConsumerBase<TMsg> {
+  public interface IConsumer<TMsg> {
     /// <summary>
     ///   Starts consuming from the specified or forceDeclared Queue
     ///   force not null --> creates the queue to be consumed from

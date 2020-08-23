@@ -2,7 +2,7 @@ namespace SharperBunny.Interfaces {
   using System;
   using System.Threading.Tasks;
 
-  public interface IAsyncConsumer<TMsg> : IConsumerBase<TMsg> {
+  public interface IAsyncConsumer<TMsg> {
     /// <summary>
     ///   Starts consuming from the specified or forceDeclared Queue
     ///   force not null --> creates the queue to be consumed from

@@ -117,7 +117,7 @@ namespace SharperBunny.Tests.Consume {
     [Fact]
     public async Task GetReturnsOperationResultFailIfNoMessages() {
       var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
-      var opResult = ((IConsumer<ConsumeMessage>)bunny.Consumer<ConsumeMessage>(get).AsAutoAck()).Get(carrot => Task.CompletedTask.Wait());
+      var opResult = bunny.Consumer<ConsumeMessage>(get).AsAutoAck().Get(carrot => Task.CompletedTask.Wait());
 
       Assert.NotNull(opResult);
       Assert.Equal(OperationState.GetFailed, opResult.State);
@@ -129,7 +129,7 @@ namespace SharperBunny.Tests.Consume {
       var msg = new ConsumeMessage();
       var bytes = Config.Serialize(msg);
       bunny.Channel(true).BasicPublish("", get, false, null, bytes);
-      var opResult = ((IConsumer<ConsumeMessage>)bunny.Consumer<ConsumeMessage>(get).AsAutoAck()).Get(carrot => Task.CompletedTask.Wait());
+      var opResult = bunny.Consumer<ConsumeMessage>(get).AsAutoAck().Get(carrot => Task.CompletedTask.Wait());
 
       Assert.NotNull(opResult);
       Assert.Equal(OperationState.Get, opResult.State);

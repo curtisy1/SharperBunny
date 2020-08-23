@@ -3,7 +3,7 @@ namespace SharperBunny.Consume {
   using RabbitMQ.Client.Events;
   using SharperBunny.Interfaces;
 
-  public class Consumer<TMsg> : ConsumerBase<TMsg>, IConsumer<TMsg> {
+  public class Consumer<TMsg> : ConsumerBase, IConsumer<TMsg> {
     private EventingBasicConsumer consumer;
     private Action<ICarrot<TMsg>> receive;
     private Action<ICarrot<TMsg>> ackBehaviour;

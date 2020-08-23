@@ -4,7 +4,7 @@ namespace SharperBunny.Consume {
   using RabbitMQ.Client.Events;
   using SharperBunny.Interfaces;
 
-  public class AsyncConsumer<TMsg> : ConsumerBase<TMsg>, IAsyncConsumer<TMsg> {
+  public class AsyncConsumer<TMsg> : ConsumerBase, IAsyncConsumer<TMsg> {
     private AsyncEventingBasicConsumer consumer;
     private Func<IAsyncCarrot<TMsg>, Task> receive;
     private Func<IAsyncCarrot<TMsg>, Task> ackBehaviour;
