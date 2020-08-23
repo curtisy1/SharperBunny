@@ -14,7 +14,7 @@ namespace SharperBunny.Interfaces {
     ///   Leave out the carrot.SendAckAsync if you use AutoAck!
     /// </summary>
     Task<OperationResult<TMsg>> Get(Func<IAsyncCarrot<TMsg>, Task> carrot);
-    
+
     /// <summary>
     ///   Define what your consumer does with the message. Carrot helps to ack/nack messages
     /// </summary>
@@ -29,7 +29,7 @@ namespace SharperBunny.Interfaces {
     ///   Define custom behaviour for rejecting messages when acknowledging failed.
     /// </summary>
     IAsyncConsumer<TMsg> NackBehaviour(Func<IAsyncCarrot<TMsg>, Task> nackBehaviour);
-    
+
     /// <summary>
     ///   Specify your own Deserialize function for deserializing the message. Default is Json.
     /// </summary>

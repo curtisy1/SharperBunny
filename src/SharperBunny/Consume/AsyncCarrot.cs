@@ -1,7 +1,6 @@
 namespace SharperBunny.Consume {
   using System;
   using System.Threading.Tasks;
-  using RabbitMQ.Client;
   using SharperBunny.Connection;
   using SharperBunny.Interfaces;
 

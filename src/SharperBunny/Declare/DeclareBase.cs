@@ -1,5 +1,4 @@
 namespace SharperBunny.Declare {
-  using System.Threading.Tasks;
   using SharperBunny.Exceptions;
   using SharperBunny.Interfaces;
 

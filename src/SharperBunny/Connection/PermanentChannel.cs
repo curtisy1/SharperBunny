@@ -8,8 +8,8 @@ namespace SharperBunny.Connection {
   /// </summary>
   public class PermanentChannel : IDisposable {
     private readonly IBunny bunny;
-    private IModel model;
     private bool disposedValue;
+    private IModel model;
 
     public PermanentChannel(IBunny bunny) {
       this.bunny = bunny;

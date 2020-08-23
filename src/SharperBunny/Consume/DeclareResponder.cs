@@ -14,15 +14,17 @@ namespace SharperBunny.Consume {
     private const string defaultExchange = "";
 
     private readonly IBunny bunny;
-    private readonly string rpcExchange;
     private readonly string consumeFromQueue;
+    private readonly Func<TRequest, TResponse> respond;
+    private readonly string rpcExchange;
     private readonly PermanentChannel thisChannel;
+    private Func<ReadOnlyMemory<byte>, TRequest> deserialize;
+
+    private bool disposedValue;
+    private Func<TResponse, byte[]> serialize;
 
     private bool useTempQueue;
     private bool useUniqueChannel;
-    private Func<ReadOnlyMemory<byte>, TRequest> deserialize;
-    private Func<TResponse, byte[]> serialize;
-    private readonly Func<TRequest, TResponse> respond;
 
     public DeclareResponder(IBunny bunny, string rpcExchange, string fromQueue, Func<TRequest, TResponse> respond) {
       this.bunny = bunny;
@@ -63,9 +65,9 @@ namespace SharperBunny.Consume {
         .Bind(this.rpcExchange, this.consumeFromQueue);
 
       var consumeResult = this.bunny.Consumer<TRequest>(this.consumeFromQueue)
-                            .DeserializeMessage(this.deserialize)
-                            .Callback(Receiver)
-                            .StartConsuming(forceDeclare);
+        .DeserializeMessage(this.deserialize)
+        .Callback(Receiver)
+        .StartConsuming(forceDeclare);
 
       if (consumeResult.IsSuccess) {
         result.IsSuccess = true;
@@ -94,7 +96,9 @@ namespace SharperBunny.Consume {
       return this;
     }
 
-    private bool disposedValue;
+    public void Dispose() {
+      this.Dispose(true);
+    }
 
     protected virtual void Dispose(bool disposing) {
       if (this.disposedValue) {
@@ -106,10 +110,6 @@ namespace SharperBunny.Consume {
       }
 
       this.disposedValue = true;
-    }
-
-    public void Dispose() {
-      this.Dispose(true);
     }
   }
 }

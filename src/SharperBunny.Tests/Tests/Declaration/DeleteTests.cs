@@ -1,8 +1,6 @@
 namespace SharperBunny.Tests.Declaration {
   using System.Threading.Tasks;
-  using SharperBunny.Declare;
   using SharperBunny.Extensions;
-  using SharperBunny.Interfaces;
   using SharperBunny.Tests.Connection;
   using Xunit;
 

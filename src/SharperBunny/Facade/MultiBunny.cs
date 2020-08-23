@@ -11,7 +11,7 @@ namespace SharperBunny.Facade {
     private readonly IList<AmqpTcpEndpoint> endpoints;
     private readonly IConnectionFactory factory;
     private readonly List<IModel> models = new List<IModel>();
-    
+
     private IConnection connection;
     private bool disposedValue;
 
@@ -44,12 +44,16 @@ namespace SharperBunny.Facade {
       }
     }
 
+    public void Dispose() {
+      this.Dispose(true);
+    }
+
     private void SetConnected() {
       if (!this.connection.IsOpen) {
         this.connection = this.factory.CreateConnection(this.endpoints);
       }
     }
-    
+
     protected virtual void Dispose(bool disposing) {
       if (this.disposedValue) {
         return;
@@ -63,10 +67,6 @@ namespace SharperBunny.Facade {
       }
 
       this.disposedValue = true;
-    }
-
-    public void Dispose() {
-      this.Dispose(true);
     }
   }
 }

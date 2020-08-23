@@ -5,11 +5,11 @@ namespace SharperBunny.Consume {
   using SharperBunny.Interfaces;
 
   public class AsyncConsumer<TMsg> : ConsumerBase, IAsyncConsumer<TMsg> {
-    private AsyncEventingBasicConsumer consumer;
-    private Func<IAsyncCarrot<TMsg>, Task> receive;
     private Func<IAsyncCarrot<TMsg>, Task> ackBehaviour;
-    private Func<IAsyncCarrot<TMsg>, Task> nackBehaviour;
+    private AsyncEventingBasicConsumer consumer;
     private Func<ReadOnlyMemory<byte>, TMsg> deserialize;
+    private Func<IAsyncCarrot<TMsg>, Task> nackBehaviour;
+    private Func<IAsyncCarrot<TMsg>, Task> receive;
 
     public AsyncConsumer(IBunny bunny, string fromQueue) : base(bunny, fromQueue) {
       this.receive = async carrot => await carrot.SendAck();
@@ -97,7 +97,7 @@ namespace SharperBunny.Consume {
       this.nackBehaviour = nackBehaviour;
       return this;
     }
-    
+
     public IAsyncConsumer<TMsg> DeserializeMessage(Func<ReadOnlyMemory<byte>, TMsg> deserialize) {
       this.deserialize = deserialize;
       return this;
@@ -107,7 +107,7 @@ namespace SharperBunny.Consume {
       this.Dispose(true);
       return Task.CompletedTask;
     }
-    
+
     protected override void Dispose(bool disposing) {
       if (this.disposedValue) {
         return;

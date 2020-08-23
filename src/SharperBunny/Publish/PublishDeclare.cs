@@ -12,10 +12,27 @@ namespace SharperBunny.Publish {
   public class DeclarePublisher<T> : IPublish<T>
     where T : class {
     private readonly IBunny bunny;
-    private readonly PermanentChannel thisChannel;
     private readonly string publishTo;
+    private readonly PermanentChannel thisChannel;
+    private Func<BasicAckEventArgs, Task> ackCallback = context => Task.CompletedTask;
+    private bool disposedValue;
+    private Func<BasicNackEventArgs, Task> nackCallback = context => Task.CompletedTask;
+    private IQueue queueDeclare;
+    private Func<BasicReturnEventArgs, Task> returnCallback = context => Task.CompletedTask;
+
+    private string routingKey;
 
     private Func<T, byte[]> serialize;
+    private bool uniqueChannel;
+    private bool useConfirm;
+
+    public DeclarePublisher(IBunny bunny, string publishTo) {
+      this.bunny = bunny;
+      this.publishTo = publishTo;
+      this.serialize = Config.Serialize;
+      this.thisChannel = new PermanentChannel(bunny);
+    }
+
     private bool Mandatory { get; set; }
     private bool ConfirmActivated { get; set; }
     private bool Persistent { get; set; }
@@ -29,22 +46,6 @@ namespace SharperBunny.Publish {
 
         return this.queueDeclare != null ? this.queueDeclare.RoutingKey : typeof(T).FullName;
       }
-    }
-
-    private string routingKey;
-    private bool uniqueChannel;
-    private IQueue queueDeclare;
-    private bool useConfirm;
-    private Func<BasicReturnEventArgs, Task> returnCallback = context => Task.CompletedTask;
-    private Func<BasicAckEventArgs, Task> ackCallback = context => Task.CompletedTask;
-    private Func<BasicNackEventArgs, Task> nackCallback = context => Task.CompletedTask;
-    private bool disposedValue;
-
-    public DeclarePublisher(IBunny bunny, string publishTo) {
-      this.bunny = bunny;
-      this.publishTo = publishTo;
-      this.serialize = Config.Serialize;
-      this.thisChannel = new PermanentChannel(bunny);
     }
 
     public virtual OperationResult<T> Send(T msg, bool force = false) {
@@ -88,55 +89,6 @@ namespace SharperBunny.Publish {
       }
 
       return operationResult;
-    }
-
-    private void Handlers(IModel channel, bool dismantle = false) {
-      if (this.Mandatory) {
-        if (dismantle) {
-          channel.BasicReturn -= this.HandleReturn;
-        } else {
-          channel.BasicReturn += this.HandleReturn;
-        }
-      }
-
-      if (!this.useConfirm) {
-        return;
-      }
-
-      if (dismantle) {
-        channel.BasicNacks -= this.HandleNack;
-        channel.BasicAcks -= this.HandleAck;
-      } else {
-        channel.BasicNacks += this.HandleNack;
-        channel.BasicAcks += this.HandleAck;
-      }
-    }
-
-    private async void HandleReturn(object sender, BasicReturnEventArgs eventArgs) {
-      await this.returnCallback(eventArgs);
-    }
-
-    private async void HandleAck(object sender, BasicAckEventArgs eventArgs) {
-      await this.ackCallback(eventArgs);
-    }
-
-    private async void HandleNack(object sender, BasicNackEventArgs eventArgs) {
-      await this.nackCallback(eventArgs);
-    }
-
-    public static IBasicProperties ConstructProperties(IBasicProperties basicProperties, bool persistent, int? expires) {
-      basicProperties.Persistent = persistent;
-      basicProperties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-      basicProperties.Type = typeof(T).FullName;
-      if (expires.HasValue) {
-        basicProperties.Expiration = expires.Value.ToString();
-      }
-
-      basicProperties.CorrelationId = Guid.NewGuid().ToString();
-      basicProperties.ContentType = Config.ContentType;
-      basicProperties.ContentEncoding = Config.ContentEncoding;
-
-      return basicProperties;
     }
 
     public IPublish<T> AsMandatory(Func<BasicReturnEventArgs, Task> onReturn) {
@@ -193,6 +145,59 @@ namespace SharperBunny.Publish {
       return this;
     }
 
+    public void Dispose() {
+      this.Dispose(true);
+    }
+
+    private void Handlers(IModel channel, bool dismantle = false) {
+      if (this.Mandatory) {
+        if (dismantle) {
+          channel.BasicReturn -= this.HandleReturn;
+        } else {
+          channel.BasicReturn += this.HandleReturn;
+        }
+      }
+
+      if (!this.useConfirm) {
+        return;
+      }
+
+      if (dismantle) {
+        channel.BasicNacks -= this.HandleNack;
+        channel.BasicAcks -= this.HandleAck;
+      } else {
+        channel.BasicNacks += this.HandleNack;
+        channel.BasicAcks += this.HandleAck;
+      }
+    }
+
+    private async void HandleReturn(object sender, BasicReturnEventArgs eventArgs) {
+      await this.returnCallback(eventArgs);
+    }
+
+    private async void HandleAck(object sender, BasicAckEventArgs eventArgs) {
+      await this.ackCallback(eventArgs);
+    }
+
+    private async void HandleNack(object sender, BasicNackEventArgs eventArgs) {
+      await this.nackCallback(eventArgs);
+    }
+
+    public static IBasicProperties ConstructProperties(IBasicProperties basicProperties, bool persistent, int? expires) {
+      basicProperties.Persistent = persistent;
+      basicProperties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+      basicProperties.Type = typeof(T).FullName;
+      if (expires.HasValue) {
+        basicProperties.Expiration = expires.Value.ToString();
+      }
+
+      basicProperties.CorrelationId = Guid.NewGuid().ToString();
+      basicProperties.ContentType = Config.ContentType;
+      basicProperties.ContentEncoding = Config.ContentEncoding;
+
+      return basicProperties;
+    }
+
     protected virtual void Dispose(bool disposing) {
       if (!this.disposedValue) {
         if (disposing) {
@@ -202,10 +207,6 @@ namespace SharperBunny.Publish {
 
         this.disposedValue = true;
       }
-    }
-
-    public void Dispose() {
-      this.Dispose(true);
     }
   }
 }

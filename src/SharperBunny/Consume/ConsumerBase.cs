@@ -10,15 +10,19 @@ namespace SharperBunny.Consume {
     protected readonly PermanentChannel thisChannel;
 
     protected internal bool autoAck;
-    protected internal ushort prefetchCount = 50;
-    protected internal bool useUniqueChannel;
     protected string consumeFromQueue;
     protected bool disposedValue;
+    protected internal ushort prefetchCount = 50;
+    protected internal bool useUniqueChannel;
 
     protected ConsumerBase(IBunny bunny, string fromQueue) {
       this.bunny = bunny;
       this.consumeFromQueue = fromQueue;
       this.thisChannel = new PermanentChannel(bunny);
+    }
+
+    public void Dispose() {
+      this.Dispose(true);
     }
 
     protected virtual void Dispose(bool disposing) {
@@ -31,10 +35,6 @@ namespace SharperBunny.Consume {
       }
 
       this.disposedValue = true;
-    }
-
-    public void Dispose() {
-      this.Dispose(true);
     }
   }
 }

@@ -6,7 +6,7 @@ namespace SharperBunny.Extensions {
       (consumer as ConsumerBase).autoAck = autoAck;
       return consumer;
     }
-    
+
     public static T AddTag<T>(this T consumer, string tag, object value) {
       var consumerBase = consumer as ConsumerBase;
       if (consumerBase.arguments.ContainsKey(tag)) {
@@ -14,15 +14,15 @@ namespace SharperBunny.Extensions {
       } else {
         consumerBase.arguments.Add(tag, value);
       }
-    
+
       return consumer;
     }
-    
+
     public static T UseUniqueChannel<T>(this T consumer, bool useUnique = true) {
       (consumer as ConsumerBase).useUniqueChannel = useUnique;
       return consumer;
     }
-    
+
     public static T Prefetch<T>(this T consumer, ushort prefetchCount = 50) {
       (consumer as ConsumerBase).prefetchCount = prefetchCount;
       return consumer;

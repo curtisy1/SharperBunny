@@ -4,7 +4,6 @@ namespace SharperBunny.Tests.Consume {
   using System.Text.Json;
   using System.Threading.Tasks;
   using SharperBunny.Configuration;
-  using SharperBunny.Declare;
   using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
   using SharperBunny.Tests.Connection;
@@ -80,13 +79,13 @@ namespace SharperBunny.Tests.Consume {
       var before = bunny.Setup().QueueExists("force-declared");
       var queue = bunny.Setup().Queue("force-declared");
       var consumer = bunny.Consumer<ConsumeMessage>()
-                       .StartConsuming(queue);
+        .StartConsuming(queue);
 
       var after = bunny.Setup().QueueExists("force-declared");
       Assert.False(before);
       Assert.True(after);
 
-      var deleted = bunny.Setup().DeleteQueue("force-declared", force: true);
+      var deleted = bunny.Setup().DeleteQueue("force-declared", true);
       Assert.True(deleted);
     }
 

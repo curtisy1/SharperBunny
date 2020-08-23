@@ -4,11 +4,11 @@ namespace SharperBunny.Consume {
   using SharperBunny.Interfaces;
 
   public class Consumer<TMsg> : ConsumerBase, IConsumer<TMsg> {
-    private EventingBasicConsumer consumer;
-    private Action<ICarrot<TMsg>> receive;
     private Action<ICarrot<TMsg>> ackBehaviour;
-    private Action<ICarrot<TMsg>> nackBehaviour;
+    private EventingBasicConsumer consumer;
     private Func<ReadOnlyMemory<byte>, TMsg> deserialize;
+    private Action<ICarrot<TMsg>> nackBehaviour;
+    private Action<ICarrot<TMsg>> receive;
 
     public Consumer(IBunny bunny, string fromQueue) : base(bunny, fromQueue) {
       this.receive = carrot => carrot.SendAck();
@@ -44,7 +44,7 @@ namespace SharperBunny.Consume {
 
       return operationResult;
     }
-    
+
     public IConsumer<TMsg> AckBehaviour(Action<ICarrot<TMsg>> ackBehaviour) {
       this.autoAck = false;
       this.ackBehaviour = ackBehaviour;
@@ -97,10 +97,14 @@ namespace SharperBunny.Consume {
 
       return result;
     }
-    
+
     public IConsumer<TMsg> DeserializeMessage(Func<ReadOnlyMemory<byte>, TMsg> deserialize) {
       this.deserialize = deserialize;
       return this;
+    }
+
+    public void Cancel() {
+      this.Dispose(true);
     }
 
     private void HandleReceived(object channel, BasicDeliverEventArgs args) {
@@ -120,10 +124,6 @@ namespace SharperBunny.Consume {
       }
     }
 
-    public void Cancel() {
-      this.Dispose(true);
-    }
-    
     protected override void Dispose(bool disposing) {
       if (this.disposedValue) {
         return;

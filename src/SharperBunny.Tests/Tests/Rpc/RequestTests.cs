@@ -14,7 +14,7 @@ namespace SharperBunny.Tests.Rpc {
         .StartRespondingAsync();
 
       var result = bunny.Request<MyRequest, MyResponse>(rpcExchange)
-                     .Request(new MyRequest(), true);
+        .Request(new MyRequest(), true);
 
       await Task.Delay(500);
 
@@ -31,7 +31,7 @@ namespace SharperBunny.Tests.Rpc {
         .StartRespondingAsync();
 
       var result = bunny.Request<MyRequest, MyResponse>(rpcExchange)
-                     .Request(new MyRequest(), true);
+        .Request(new MyRequest(), true);
 
       await Task.Delay(500);
 

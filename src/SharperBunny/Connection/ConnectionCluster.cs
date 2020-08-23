@@ -1,7 +1,6 @@
 namespace SharperBunny.Connection {
   using System.Collections.Generic;
   using RabbitMQ.Client;
-  using SharperBunny;
   using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 

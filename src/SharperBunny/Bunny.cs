@@ -11,11 +11,10 @@ namespace SharperBunny {
   using SharperBunny.Interfaces;
 
   public static class Bunny {
+    internal static readonly IList<AmqpTcpEndpoint> Endpoints = new List<AmqpTcpEndpoint>();
     internal static bool UseAsyncEvents { get; set; }
     internal static int RetryCount { get; set; } = 3;
     internal static int RetryPauseInMs { get; set; } = 1500;
-
-    internal static readonly IList<AmqpTcpEndpoint> Endpoints = new List<AmqpTcpEndpoint>();
 
     /// <summary>
     ///   Create a permanent connection by using parameters.

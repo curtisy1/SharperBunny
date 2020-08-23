@@ -47,7 +47,7 @@ namespace SharperBunny.Tests.Declaration {
       }
 
       var @base = new DeclareQueue(ConnectSimple.Connect(), "queue");
-      Assert.Throws<DeclarationException>(() => @base.Bind(name, ""));
+      Assert.Throws<DeclarationException>(() => @base.Bind(name));
     }
 
     [Fact]

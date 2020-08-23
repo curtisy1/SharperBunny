@@ -1,12 +1,9 @@
 namespace SharperBunny.Publish {
   using System;
-  using System.Threading;
-  using System.Threading.Tasks;
   using RabbitMQ.Client;
   using RabbitMQ.Client.Events;
   using SharperBunny.Configuration;
   using SharperBunny.Connection;
-  using SharperBunny.Declare;
   using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
@@ -14,20 +11,19 @@ namespace SharperBunny.Publish {
     where TRequest : class
     where TResponse : class {
     public const string directReplyTo = "amq.rabbitmq.reply-to";
-    
+
     private readonly IBunny bunny;
-    private readonly string toExchange;
     private readonly string routingKey;
     private readonly PermanentChannel thisChannel;
-    
-    private int timeOut = 1500;
+    private readonly string toExchange;
     private Func<ReadOnlyMemory<byte>, TResponse> deserialize;
+    private bool disposedValue;
+    private IQueue queueDeclare;
     private Func<TRequest, byte[]> serialize;
+
+    private int timeOut = 1500;
     private bool useTempQueue;
     private bool useUniqueChannel;
-    private IQueue queueDeclare;
-    private string RoutingKey => this.queueDeclare != null ? this.queueDeclare.RoutingKey : this.routingKey;
-    private bool disposedValue;
 
     internal DeclareRequest(IBunny bunny, string toExchange, string routingKey) {
       this.bunny = bunny;
@@ -37,6 +33,8 @@ namespace SharperBunny.Publish {
       this.deserialize = Config.Deserialize<TResponse>;
       this.thisChannel = new PermanentChannel(this.bunny);
     }
+
+    private string RoutingKey => this.queueDeclare != null ? this.queueDeclare.RoutingKey : this.routingKey;
 
     public OperationResult<TResponse> Request(TRequest request, bool force = false) {
       var bytes = this.serialize(request);
@@ -105,6 +103,10 @@ namespace SharperBunny.Publish {
       return this;
     }
 
+    public void Dispose() {
+      this.Dispose(true);
+    }
+
     private OperationResult<TResponse> Publish(IModel channel, string replyTo, byte[] payload, OperationResult<TResponse> result, string correlationId) {
       var props = channel.CreateBasicProperties();
       props.ReplyTo = replyTo;
@@ -149,12 +151,12 @@ namespace SharperBunny.Publish {
 
       try {
         channel.BasicConsume(replyTo,
-                                                  true,
-                                                  $"temp-consumer {typeof(TRequest)}-{typeof(TResponse)}",
-                                                  false,
-                                                  false,
-                                                  null,
-                                                  consumer);
+                             true,
+                             $"temp-consumer {typeof(TRequest)}-{typeof(TResponse)}",
+                             false,
+                             false,
+                             null,
+                             consumer);
 
         result.IsSuccess = true;
         result.State = OperationState.RpcPublished;
@@ -166,7 +168,7 @@ namespace SharperBunny.Publish {
 
       return result;
     }
-    
+
     protected virtual void Dispose(bool disposing) {
       if (this.disposedValue) {
         return;
@@ -177,10 +179,6 @@ namespace SharperBunny.Publish {
       }
 
       this.disposedValue = true;
-    }
-
-    public void Dispose() {
-      this.Dispose(true);
     }
   }
 }

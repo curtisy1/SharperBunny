@@ -13,7 +13,7 @@ namespace SharperBunny.Interfaces {
     ///   Leave out the carrot.SendAckAsync if you use AutoAck!
     /// </summary>
     OperationResult<TMsg> Get(Action<ICarrot<TMsg>> carrot);
-    
+
     /// <summary>
     ///   Define what your consumer does with the message. Carrot helps to ack/nack messages
     /// </summary>

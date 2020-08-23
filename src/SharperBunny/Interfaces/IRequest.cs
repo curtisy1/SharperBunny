@@ -1,6 +1,5 @@
 namespace SharperBunny.Interfaces {
   using System;
-  using System.Threading.Tasks;
 
   /// <summary>
   ///   RPC client side.

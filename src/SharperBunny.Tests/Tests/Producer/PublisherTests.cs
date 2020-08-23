@@ -2,9 +2,7 @@ namespace SharperBunny.Tests.Producer {
   using System;
   using System.Threading.Tasks;
   using RabbitMQ.Client.Events;
-  using SharperBunny.Declare;
   using SharperBunny.Extensions;
-  using SharperBunny.Interfaces;
   using SharperBunny.Tests.Connection;
   using Xunit;
 
@@ -28,10 +26,10 @@ namespace SharperBunny.Tests.Producer {
       var publisher = bunny.Publisher<TestMessage>(this.exchange);
 
       var result = publisher
-                     .WithQueueDeclare()
-                     .Send(new TestMessage());
+        .WithQueueDeclare()
+        .Send(new TestMessage());
 
-      var success = bunny.Setup().DeleteQueue(typeof(TestMessage).FullName, force: true);
+      var success = bunny.Setup().DeleteQueue(typeof(TestMessage).FullName, true);
 
       Assert.True(result.IsSuccess);
       Assert.True(success);
@@ -46,7 +44,7 @@ namespace SharperBunny.Tests.Producer {
       var result = publisher.Send(new TestMessage(), true);
 
       Assert.True(result.IsSuccess);
-      var removedExchange = bunny.Setup().DeleteExchange("test-exchange", force: true);
+      var removedExchange = bunny.Setup().DeleteExchange("test-exchange", true);
       Assert.True(removedExchange);
       bunny.Dispose();
     }
@@ -122,7 +120,7 @@ namespace SharperBunny.Tests.Producer {
         .WithQueueDeclare()
         .Send(new TestMessage { Text = "Mandatory-succeeds" });
 
-      var removed = bunny.Setup().DeleteQueue(typeof(TestMessage).FullName, force: true);
+      var removed = bunny.Setup().DeleteQueue(typeof(TestMessage).FullName, true);
 
       Assert.True(isReturned);
       bunny.Dispose();
@@ -141,7 +139,7 @@ namespace SharperBunny.Tests.Producer {
       var count = bunny.Channel().MessageCount(queueName);
 
       Assert.Equal(2, (int)count);
-      bunny.Setup().DeleteQueue(queueName, force: true);
+      bunny.Setup().DeleteQueue(queueName, true);
     }
 
     [Fact]
@@ -163,8 +161,8 @@ namespace SharperBunny.Tests.Producer {
       Assert.Equal(1, (int)otherCount);
       Assert.Equal(1, (int)yetOtherCount);
 
-      bunny.Setup().DeleteQueue(queueName, force: true);
-      bunny.Setup().DeleteQueue(queueNameYetOther, force: true);
+      bunny.Setup().DeleteQueue(queueName, true);
+      bunny.Setup().DeleteQueue(queueNameYetOther, true);
     }
 
     public class TestMessage {

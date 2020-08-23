@@ -1,6 +1,5 @@
 namespace SharperBunny.Extensions {
   using System;
-  using System.Threading.Tasks;
   using RabbitMQ.Client;
   using SharperBunny.Declare;
   using SharperBunny.Exceptions;

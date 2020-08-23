@@ -10,11 +10,11 @@ namespace SharperBunny.Interfaces {
   /// </summary>
   public interface IConnectionPipe : IFormattable {
     IConnectionPipe ToHost(string hostName = "localhost");
-    
+
     IConnectionPipe ToPort(uint port = 5672);
-    
+
     IConnectionPipe ToVirtualHost(string vHost = "/");
-    
+
     IConnectionPipe AuthenticatePlain(string user = "guest", string password = "guest");
 
     IConnectionPipe WithRetries(int retries, int timeout);

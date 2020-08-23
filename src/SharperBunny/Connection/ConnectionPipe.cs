@@ -54,7 +54,7 @@ namespace SharperBunny.Connection {
     public IConnectionPipe WithRetries(int retries, int timeout) {
       Bunny.RetryCount = retries;
       Bunny.RetryPauseInMs = timeout;
-      return this; 
+      return this;
     }
 
     public IConnectionPipe UseAsyncEvents(bool useAsync = true) {
