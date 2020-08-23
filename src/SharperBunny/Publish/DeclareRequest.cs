@@ -10,7 +10,7 @@ namespace SharperBunny.Publish {
   public class DeclareRequest<TRequest, TResponse> : IRequest<TRequest, TResponse>
     where TRequest : class
     where TResponse : class {
-    public const string directReplyTo = "amq.rabbitmq.reply-to";
+    private const string directReplyTo = "amq.rabbitmq.reply-to";
 
     private readonly IBunny bunny;
     private readonly string routingKey;
@@ -78,7 +78,7 @@ namespace SharperBunny.Publish {
     public IRequest<TRequest, TResponse> WithQueueDeclare(string queue = null, string exchange = null, string routingKey = null) {
       var name = queue ?? typeof(TRequest).FullName;
       var rKey = routingKey ?? typeof(TRequest).FullName;
-      this.queueDeclare = this.bunny.Setup().Queue(name).Bind(this.toExchange, rKey).AsDurable();
+      this.queueDeclare = this.bunny.Setup().Queue(name).Bind(exchange ?? this.toExchange, rKey).AsDurable();
 
       return this;
     }

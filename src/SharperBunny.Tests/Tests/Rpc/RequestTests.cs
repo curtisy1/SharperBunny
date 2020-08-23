@@ -10,8 +10,8 @@ namespace SharperBunny.Tests.Rpc {
       var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
       var rpcExchange = "rpc-exchange";
 
-      await bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => new MyResponse())
-        .StartRespondingAsync();
+      bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => new MyResponse())
+        .StartResponding();
 
       var result = bunny.Request<MyRequest, MyResponse>(rpcExchange)
         .Request(new MyRequest(), true);
@@ -27,8 +27,8 @@ namespace SharperBunny.Tests.Rpc {
       var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
       var rpcExchange = "rpc-exchange";
 
-      await bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => new MyResponse())
-        .StartRespondingAsync();
+      bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => new MyResponse())
+        .StartResponding();
 
       var result = bunny.Request<MyRequest, MyResponse>(rpcExchange)
         .Request(new MyRequest(), true);

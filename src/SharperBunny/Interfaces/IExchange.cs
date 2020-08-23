@@ -16,7 +16,7 @@ namespace SharperBunny.Interfaces {
     IExchange AsDurable();
 
     /// <summary>
-    ///   Non routeable messages will be sent to this alternate exchange
+    ///   Non routable messages will be sent to this alternate exchange
     /// </summary>
     IExchange AlternateExchange(string alternate);
   }

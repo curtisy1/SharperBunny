@@ -36,7 +36,7 @@ namespace SharperBunny.Consume {
       this.deserialize = Config.Deserialize<TRequest>;
     }
 
-    public async Task<OperationResult<TResponse>> StartRespondingAsync() {
+    public OperationResult<TResponse> StartResponding() {
       var result = new OperationResult<TResponse>();
       var publisher = this.bunny.Publisher<TResponse>(defaultExchange)
         .WithSerialize(this.serialize);

@@ -5,13 +5,13 @@ namespace SharperBunny.Interfaces {
   /// <summary>
   ///   Responder for Rpc call.
   /// </summary>
-  public interface IRespond<TRequest, TResponse> : IDisposable {
+  public interface IRespond<in TRequest, TResponse> : IDisposable {
     /// <summary>
     ///   StartsResponding asynchronously to the specified Request. Make sure to have a matching IRequest on the other side.
     ///   Be aware of changing the defaults (with regards to queue naming etc.)--> apply on both sides.
     ///   A Queue is declared that is equal to the Request name, or the provided fromQueue name on creation.
     /// </summary>
-    Task<OperationResult<TResponse>> StartRespondingAsync();
+    OperationResult<TResponse> StartResponding();
 
     /// <summary>
     ///   Override serialize method
