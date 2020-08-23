@@ -17,13 +17,13 @@ namespace SharperBunny.Consume {
       this.nackBehaviour = async carrot => await carrot.SendNack(withRequeue: true);
     }
 
-    public async Task<OperationResult<TMsg>> StartConsuming(IQueue force = null) {
+    public Task<OperationResult<TMsg>> StartConsuming(IQueue force = null) {
       var result = new OperationResult<TMsg>();
       if (this.consumer == null) {
         try {
           var channel = this.thisChannel.Channel;
           if (force != null) {
-            await force.DeclareAsync();
+            force.Declare();
             this.consumeFromQueue = force.Name;
           }
 
@@ -45,7 +45,6 @@ namespace SharperBunny.Consume {
           result.State = OperationState.ConsumerAttached;
           result.IsSuccess = true;
           result.Message = default;
-          return result;
         } catch (Exception ex) {
           result.IsSuccess = false;
           result.Error = ex;
@@ -56,7 +55,7 @@ namespace SharperBunny.Consume {
         result.State = OperationState.ConsumerAttached;
       }
 
-      return result;
+      return Task.FromResult(result);
     }
 
     public async Task<OperationResult<TMsg>> Get(Func<ICarrot<TMsg>, Task> handle) {

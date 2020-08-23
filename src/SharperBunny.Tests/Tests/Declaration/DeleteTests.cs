@@ -13,7 +13,7 @@ namespace SharperBunny.Tests.Declaration {
       var declare = bunny.Setup()
         .Queue("to-delete");
 
-      await declare.DeclareAsync();
+      await declare.Declare();
       var exists = await declare.QueueExistsAsync(declare.Name);
       Assert.True(exists);
       await declare.DeleteQueueAsync(declare.Name);
@@ -27,7 +27,7 @@ namespace SharperBunny.Tests.Declaration {
       var declare = bunny.Setup()
         .Exchange("to-delete-ex", "fanout");
 
-      await declare.DeclareAsync();
+      await declare.Declare();
       var exists = await declare.ExchangeExistsAsync(declare.Name);
       Assert.True(exists);
       await declare.DeleteExchangeAsync(declare.Name);

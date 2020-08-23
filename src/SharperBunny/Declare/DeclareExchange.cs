@@ -39,9 +39,8 @@ namespace SharperBunny.Declare {
       return this;
     }
 
-    public async Task DeclareAsync() {
-      var exists = await this.Bunny.ExchangeExistsAsync(this.Name);
-      if (exists) {
+    public void Declare() {
+      if (this.Bunny.ExchangeExists(this.Name)) {
         return;
       }
 
@@ -49,11 +48,11 @@ namespace SharperBunny.Declare {
       try {
         channel = this.Bunny.Channel(true);
 
-        await Task.Run(() => { channel.ExchangeDeclare(this.Name, this.ExchangeType, this.Durable, this.AutoDelete, this.args); });
+        channel.ExchangeDeclare(this.Name, this.ExchangeType, this.Durable, this.AutoDelete, this.args);
       } catch (Exception exc) {
         throw DeclarationException.DeclareFailed(exc, "exchange-declare failed!");
       } finally {
-        channel.Close();
+        channel?.Close();
       }
     }
   }

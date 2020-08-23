@@ -21,10 +21,19 @@ namespace SharperBunny.Extensions {
     /// <summary>
     ///   Create a Consumer to subscribe to a Queue. If no queue is specified the Queue Name will be AssemblyName.TypeName
     /// </summary>
-    public static Consumer<TMsg> Consumer<TMsg>(this IBunny bunny, string fromQueue = null) {
+    public static IConsumer<TMsg> Consumer<TMsg>(this IBunny bunny, string fromQueue = null) {
       fromQueue ??= SerializeTypeName<TMsg>();
 
       return new Consumer<TMsg>(bunny, fromQueue);
+    }
+
+    /// <summary>
+    ///   Create a AsyncConsumer to subscribe to a Queue. If no queue is specified the Queue Name will be AssemblyName.TypeName
+    /// </summary>
+    public static IAsyncConsumer<TMsg> AsyncConsumer<TMsg>(this IBunny bunny, string fromQueue = null) {
+      fromQueue ??= SerializeTypeName<TMsg>();
+
+      return new AsyncConsumer<TMsg>(bunny, fromQueue);
     }
 
     /// <summary>
@@ -55,11 +64,11 @@ namespace SharperBunny.Extensions {
     public static IDeclare Setup(this IBunny bunny) {
       return new DeclareBase { Bunny = bunny };
     }
-    
-    internal static async Task<bool> QueueExistsAsync(this IBunny bunny, string name) {
+
+    internal static bool QueueExists(this IBunny bunny, string name) {
       try {
         var channel = bunny.Channel(true);
-        var result = await new TaskFactory().StartNew(() => channel.QueueDeclarePassive(name));
+        channel.QueueDeclarePassive(name);
 
         return true;
       } catch (OperationInterruptedException) {
@@ -69,10 +78,10 @@ namespace SharperBunny.Extensions {
       }
     }
 
-    internal static async Task<bool> ExchangeExistsAsync(this IBunny bunny, string name) {
+    internal static bool ExchangeExists(this IBunny bunny, string name) {
       try {
         var channel = bunny.Channel(true);
-        await Task.Run(() => channel.ExchangeDeclarePassive(name));
+        channel.ExchangeDeclarePassive(name);
 
         return true;
       } catch (OperationInterruptedException) {

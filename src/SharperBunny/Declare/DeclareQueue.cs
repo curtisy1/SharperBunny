@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace SharperBunny.Declare {
   using System;
   using System.Collections.Generic;
@@ -27,13 +25,12 @@ namespace SharperBunny.Declare {
 
     public string RoutingKey => this.BindingKey.HasValue ? this.BindingKey.Value.rKey : this.Name;
 
-    public async Task DeclareAsync() {
+    public void Declare() {
       if (this.wasDeclared) {
         return;
       }
 
-      var exists = await this.Bunny.QueueExistsAsync(this.Name);
-      if (exists) {
+      if (this.Bunny.QueueExists(this.Name)) {
         return;
       }
 
@@ -41,8 +38,8 @@ namespace SharperBunny.Declare {
       try {
         channel = this.Bunny.Channel(true);
 
-        await this.Declare(channel);
-        await this.Bind(channel);
+        this.Declare(channel);
+        this.Bind(channel);
       } catch (Exception exc) {
         throw DeclarationException.DeclareFailed(exc, "queue-declare failed");
       } finally {
@@ -75,26 +72,25 @@ namespace SharperBunny.Declare {
       return this;
     }
 
-    private Task Declare(IModel channel) {
-      return Task.Run(() =>
-                        channel.QueueDeclare(this.Name,
-                                             this.Durable.HasValue ? this.Durable.Value : true,
-                                             false,
-                                             this.AutoDelete.HasValue ? this.AutoDelete.Value : false,
-                                             this.arguments.Any() ? this.arguments : null));
+    private void Declare(IModel channel) {
+      channel.QueueDeclare(this.Name,
+                           this.Durable ?? true,
+                           false,
+                           this.AutoDelete ?? false,
+                           this.arguments.Any() ? this.arguments : null);
     }
 
-    private async Task Bind(IModel channel) {
-      if (this.BindingKey.HasValue) {
-        var (ex, bkey) = this.BindingKey.Value;
-        await Task.Run(() => {
-          if (channel.IsClosed) {
-            channel = this.Bunny.Channel(true);
-          }
-
-          channel.QueueBind(this.Name, ex, bkey, null);
-        });
+    private void Bind(IModel channel) {
+      if (!this.BindingKey.HasValue) {
+        return;
       }
+
+      var (ex, bkey) = this.BindingKey.Value;
+      if (channel.IsClosed) {
+        channel = this.Bunny.Channel(true);
+      }
+
+      channel.QueueBind(this.Name, ex, bkey, null);
     }
   }
 }

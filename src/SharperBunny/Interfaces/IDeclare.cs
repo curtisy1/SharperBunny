@@ -1,6 +1,4 @@
 namespace SharperBunny.Interfaces {
-  using System.Threading.Tasks;
-
   /// <summary>
   ///   Entry point to setup RabbitMQ Entities.
   /// </summary>
@@ -10,6 +8,6 @@ namespace SharperBunny.Interfaces {
     /// <summary>
     ///   Execute the Declaration
     /// </summary>
-    Task DeclareAsync();
+    void Declare();
   }
 }

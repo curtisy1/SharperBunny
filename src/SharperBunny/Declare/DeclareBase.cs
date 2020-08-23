@@ -9,7 +9,7 @@ namespace SharperBunny.Declare {
   public class DeclareBase : IDeclare {
     public IBunny Bunny { get; set; }
 
-    public Task DeclareAsync() {
+    public void Declare() {
       throw DeclarationException.BaseNotValid();
     }
   }

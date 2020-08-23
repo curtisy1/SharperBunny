@@ -62,7 +62,7 @@ namespace SharperBunny.Consume {
         try {
           var channel = this.thisChannel.Channel;
           if (force != null) {
-            await force.DeclareAsync();
+            force.Declare();
             this.consumeFromQueue = force.Name;
           }
 

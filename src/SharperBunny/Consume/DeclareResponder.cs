@@ -40,7 +40,8 @@ namespace SharperBunny.Consume {
         .WithSerialize(this.serialize);
 
       publisher.UseUniqueChannel(this.useUniqueChannel);
-      Func<ICarrot<TRequest>, Task> receiver = async carrot => {
+
+      async Task Receiver(ICarrot<TRequest> carrot) {
         var request = carrot.Message;
         try {
           var response = await this.respond(request);
@@ -53,7 +54,7 @@ namespace SharperBunny.Consume {
           result.State = OperationState.RpcReplyFailed;
           result.Error = ex;
         }
-      };
+      }
 
       // consume
       var forceDeclare = this.bunny.Setup()
@@ -61,9 +62,9 @@ namespace SharperBunny.Consume {
         .AsDurable()
         .Bind(this.rpcExchange, this.consumeFromQueue);
 
-      var consumeResult = await this.bunny.Consumer<TRequest>(this.consumeFromQueue)
+      var consumeResult = await this.bunny.AsyncConsumer<TRequest>(this.consumeFromQueue)
                             .DeserializeMessage(this.deserialize)
-                            .Callback(receiver)
+                            .Callback(Receiver)
                             .StartConsuming(forceDeclare);
 
       if (consumeResult.IsSuccess) {

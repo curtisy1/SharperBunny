@@ -56,9 +56,8 @@ namespace SharperBunny.Extensions {
       return ExecuteOnChannelAsync(bunny, model => model.QueueDelete(queue, !force, !force));
     }
 
-    public static Task<bool> QueueExistsAsync(this IDeclare declare, string queue) {
-      var bunny = CheckGetBunny(declare, queue, "queue");
-      return bunny.QueueExistsAsync(queue);
+    public static bool QueueExistsAsync(this IDeclare declare, string queue) {
+      return CheckGetBunny(declare, queue, "queue").QueueExists(queue);
     }
 
 
@@ -72,9 +71,8 @@ namespace SharperBunny.Extensions {
       return ExecuteOnChannelAsync(bunny, model => model.ExchangeDelete(exchangeName, !force));
     }
 
-    public static Task<bool> ExchangeExistsAsync(this IDeclare declare, string exchangeName) {
-      var bunny = CheckGetBunny(declare, exchangeName, "exchange");
-      return bunny.ExchangeExistsAsync(exchangeName);
+    public static bool ExchangeExistsAsync(this IDeclare declare, string exchangeName) {
+      return CheckGetBunny(declare, exchangeName, "exchange").ExchangeExists(exchangeName);
     }
   }
 }

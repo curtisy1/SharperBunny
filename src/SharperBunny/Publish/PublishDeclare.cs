@@ -56,15 +56,13 @@ namespace SharperBunny.Publish {
         var properties = ConstructProperties(channel.CreateBasicProperties(), this.Persistent, this.Expires);
         this.Handlers(channel);
 
-        if (this.queueDeclare != null) {
-          await this.queueDeclare.DeclareAsync();
-        }
+        this.queueDeclare?.Declare();
 
         if (force) {
-          await this.bunny.Setup()
+          this.bunny.Setup()
             .Exchange(this.publishTo)
             .AsDurable()
-            .DeclareAsync();
+            .Declare();
         }
 
         await Task.Run(() => {
