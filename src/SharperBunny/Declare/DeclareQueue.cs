@@ -16,9 +16,10 @@ namespace SharperBunny.Declare {
       this.Bunny = bunny;
     }
 
-    private bool? Durable { get; set; } = false;
+    private bool Durable { get; set; } = true;
     public (string ex, string rKey)? BindingKey { get; set; }
-    private bool? AutoDelete { get; set; }
+    private bool AutoDelete { get; set; }
+    private bool Exclusive { get; set; }
     public IBunny Bunny { get; set; }
     public string Name { get; }
 
@@ -73,9 +74,9 @@ namespace SharperBunny.Declare {
 
     private void Declare(IModel channel) {
       channel.QueueDeclare(this.Name,
-                           this.Durable ?? true,
-                           false,
-                           this.AutoDelete ?? false,
+                           this.Durable,
+                           this.Exclusive,
+                           this.AutoDelete,
                            this.arguments.Any() ? this.arguments : null);
     }
 
