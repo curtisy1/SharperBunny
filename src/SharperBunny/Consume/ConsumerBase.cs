@@ -4,7 +4,7 @@ namespace SharperBunny.Consume {
   using SharperBunny.Connection;
   using SharperBunny.Interfaces;
 
-  public class ConsumerBase : IDisposable {
+  public class ConsumerBase : IConsumerBase, IDisposable {
     protected internal readonly Dictionary<string, object> arguments = new Dictionary<string, object>();
     protected readonly IBunny bunny;
     protected readonly PermanentChannel thisChannel;
