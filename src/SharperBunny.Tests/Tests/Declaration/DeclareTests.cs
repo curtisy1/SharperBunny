@@ -46,20 +46,20 @@ namespace SharperBunny.Tests.Declaration {
         name = name.PadRight(500, '-');
       }
 
-      var @base = new DeclareQueue(ConnectSimple.Connect(), "queue");
+      var @base = new DeclareQueue(ConnectionClusterTests.Connect(), "queue");
       Assert.Throws<DeclarationException>(() => @base.Bind(name));
     }
 
     [Fact]
     public void BindAsSetsBindingKeyOn() {
-      var @base = new DeclareQueue(ConnectSimple.Connect(), "queue");
+      var @base = new DeclareQueue(ConnectionClusterTests.Connect(), "queue");
       @base.Bind("ex", "bind-key");
       Assert.Equal("bind-key", @base.BindingKey.HasValue ? @base.BindingKey.Value.rKey : "null");
     }
 
     [Fact]
     public async Task DeclareAndBindDefaultAmqDirectSucceeds() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var declare = bunny.Setup()
         .Queue("bind-test")
         .Bind("amq.direct", "bind-test-key")

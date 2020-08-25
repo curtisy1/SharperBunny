@@ -1,12 +1,11 @@
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("SharperBunny.Tests")]
 namespace SharperBunny.Connection {
-  using System.Collections.Generic;
-  using RabbitMQ.Client;
   using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class ConnectionCluster : IConnectionCluster {
-    private readonly IList<AmqpTcpEndpoint> endpoints = new List<AmqpTcpEndpoint>();
-
     public IConnectionCluster AddNode(string amqpUri) {
       Bunny.Endpoints.Add(amqpUri.ParseEndpoint());
       return this;

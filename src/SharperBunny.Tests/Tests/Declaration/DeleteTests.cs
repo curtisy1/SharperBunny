@@ -7,7 +7,7 @@ namespace SharperBunny.Tests.Declaration {
   public class DeleteTests {
     [Fact]
     public async Task DeclareAndDeleteQueueNotExistsAfterWards() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var declare = bunny.Setup()
         .Queue("to-delete");
 
@@ -21,7 +21,7 @@ namespace SharperBunny.Tests.Declaration {
 
     [Fact]
     public async Task DeclareAndDeleteExchangeNotExistsAfterWards() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var declare = bunny.Setup()
         .Exchange("to-delete-ex", "fanout");
 

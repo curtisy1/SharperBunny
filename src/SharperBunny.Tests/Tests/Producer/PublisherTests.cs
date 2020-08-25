@@ -11,7 +11,7 @@ namespace SharperBunny.Tests.Producer {
 
     [Fact]
     public async Task PublisherSimplySendsWithoutQueueReturnsFailure() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var publisher = bunny.Publisher<TestMessage>(this.exchange);
 
       var result = publisher.Send(new TestMessage());
@@ -22,7 +22,7 @@ namespace SharperBunny.Tests.Producer {
 
     [Fact]
     public async Task PublisherSimplySendsWitQueueReturnsSuccess() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var publisher = bunny.Publisher<TestMessage>(this.exchange);
 
       var result = publisher
@@ -38,7 +38,7 @@ namespace SharperBunny.Tests.Producer {
 
     [Fact]
     public async Task ForceCreatesTheExchangeIfNotExists() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var publisher = bunny.Publisher<TestMessage>("test-exchange");
 
       var result = publisher.Send(new TestMessage(), true);
@@ -51,7 +51,7 @@ namespace SharperBunny.Tests.Producer {
 
     [Fact]
     public async Task ConfirmsAndAcksWork() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var queue = bunny.Setup()
         .Queue("constraint")
         .MaxLength(1)
@@ -87,7 +87,7 @@ namespace SharperBunny.Tests.Producer {
 
     [Fact]
     public async Task MandatoryFailsWithoutQueue() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
 
       var isReturned = false;
       var publisher = bunny.Publisher<TestMessage>("amq.direct");
@@ -107,7 +107,7 @@ namespace SharperBunny.Tests.Producer {
 
     [Fact]
     public async Task MandatoryWorksWithQueue() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
 
       var isReturned = true;
       var publisher = bunny.Publisher<TestMessage>("amq.direct");
@@ -128,7 +128,7 @@ namespace SharperBunny.Tests.Producer {
 
     [Fact]
     public async Task MultiplePublishOnSinglePublisher() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var publisher = bunny.Publisher<TestMessage>("amq.direct");
 
       var queueName = "polymorph-queue";
@@ -144,7 +144,7 @@ namespace SharperBunny.Tests.Producer {
 
     [Fact]
     public async Task OverWriteRoutingKeySendsToDifferentQueuesEachTime() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var publisher = bunny.Publisher<TestMessage>("amq.direct");
 
       var queueName = "polymorph-queue-other";

@@ -28,7 +28,7 @@ namespace SharperBunny.Tests.Consume {
     }
 
     private async Task<IBunny> ConsumeGeneric(Action<ICarrot<ConsumeMessage>> carrot, string toQueue = queue) {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
 
       var consumer = bunny.Consumer<ConsumeMessage>(toQueue).Callback(carrot);
       var operationResult = consumer.StartConsuming();
@@ -53,7 +53,7 @@ namespace SharperBunny.Tests.Consume {
 
     [Fact]
     public async Task MultipleCallToConsumeAlwaysReturnSuccess() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
 
       ConsumeMessage result = null;
       var consumer = bunny.Consumer<ConsumeMessage>(queue).Callback(async carrot => {
@@ -74,7 +74,7 @@ namespace SharperBunny.Tests.Consume {
 
     [Fact]
     public async Task StartConsumingAsyncWithForceDeclaresTheQueue() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
 
       var before = bunny.Setup().QueueExists("force-declared");
       var queue = bunny.Setup().Queue("force-declared");
@@ -91,7 +91,7 @@ namespace SharperBunny.Tests.Consume {
 
     [Fact]
     public void NackRequeues() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
 
       var consumer = bunny.Consumer<ConsumeMessage>(queue).Callback(async carrot => {
         var result = carrot.SendNack(withRequeue: true);
@@ -115,7 +115,7 @@ namespace SharperBunny.Tests.Consume {
 
     [Fact]
     public async Task GetReturnsOperationResultFailIfNoMessages() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var opResult = bunny.Consumer<ConsumeMessage>(get).AsAutoAck().Get(carrot => Task.CompletedTask.Wait());
 
       Assert.NotNull(opResult);
@@ -124,7 +124,7 @@ namespace SharperBunny.Tests.Consume {
 
     [Fact]
     public async Task GetSucceedsIfMessageIsAvailable() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var msg = new ConsumeMessage();
       var bytes = Config.Serialize(msg);
       bunny.Channel(true).BasicPublish("", get, false, null, bytes);

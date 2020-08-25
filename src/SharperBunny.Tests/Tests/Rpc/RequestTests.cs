@@ -7,7 +7,7 @@ namespace SharperBunny.Tests.Rpc {
   public class RequestTests {
     [Fact]
     public async Task DirectReplyWorks() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var rpcExchange = "rpc-exchange";
 
       bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => new MyResponse())
@@ -24,7 +24,7 @@ namespace SharperBunny.Tests.Rpc {
 
     [Fact]
     public async Task WithTemporaryQueueWorksAlso() {
-      var bunny = Bunny.ConnectSingle(ConnectSimple.BasicAmqp);
+      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
       var rpcExchange = "rpc-exchange";
 
       bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => new MyResponse())
