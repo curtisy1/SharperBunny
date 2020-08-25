@@ -1,12 +1,13 @@
 namespace SharperBunny.Consume {
   using System;
+  using System.Threading.Tasks;
   using SharperBunny.Connection;
   using SharperBunny.Interfaces;
 
-  public class Carrot<TMsg> : CarrotBase<TMsg>, ICarrot<TMsg> {
-    public Carrot(TMsg message, ulong deliveryTag, PermanentChannel thisChannel) : base(message, deliveryTag, thisChannel) { }
+  public class AsyncCarrot<TMsg> : CarrotBase<TMsg>, IAsyncCarrot<TMsg> {
+    public AsyncCarrot(TMsg message, ulong deliveryTag, PermanentChannel thisChannel) : base(message, deliveryTag, thisChannel) { }
 
-    public OperationResult<TMsg> SendAck(bool multiple = false) {
+    public Task<OperationResult<TMsg>> SendAck(bool multiple = false) {
       var result = new OperationResult<TMsg>();
       try {
         this.thisChannel.Channel.BasicAck(this.DeliveryTag, multiple);
@@ -18,10 +19,10 @@ namespace SharperBunny.Consume {
         result.State = OperationState.Failed;
       }
 
-      return result;
+      return Task.FromResult(result);
     }
 
-    public OperationResult<TMsg> SendNack(bool multiple = false, bool withRequeue = true) {
+    public Task<OperationResult<TMsg>> SendNack(bool multiple = false, bool withRequeue = true) {
       var result = new OperationResult<TMsg>();
       try {
         this.thisChannel.Channel.BasicNack(this.DeliveryTag, multiple, withRequeue);
@@ -33,7 +34,7 @@ namespace SharperBunny.Consume {
         result.State = OperationState.Failed;
       }
 
-      return result;
+      return Task.FromResult(result);
     }
   }
 }

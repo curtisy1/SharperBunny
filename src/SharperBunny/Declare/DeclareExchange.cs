@@ -1,64 +1,58 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using RabbitMQ.Client;
-using SharperBunny.Exceptions;
-using SharperBunny.Utils;
-
 namespace SharperBunny.Declare {
-    public class DeclareExchange : IExchange {
-        private readonly IBunny _bunny;
-        public IBunny Bunny => _bunny;
-        public DeclareExchange (IBunny bunny, string name, string type) {
-            _bunny = bunny;
-            Name = name;
-            ExchangeType = type;
-        }
+  using System;
+  using System.Collections.Generic;
+  using RabbitMQ.Client;
+  using SharperBunny.Exceptions;
+  using SharperBunny.Extensions;
+  using SharperBunny.Interfaces;
 
-        public string Name { get; set; }
-        internal bool Durable { get; set; } = false;
-        internal bool AutoDelete { get; set; } = false;
-        internal string ExchangeType { get; set; } = "direct";
+  public class DeclareExchange : IExchange {
+    private readonly Dictionary<string, object> args = new Dictionary<string, object>();
 
-        private Dictionary<string, object> _args = new Dictionary<string, object> ();
-
-        public IExchange AlternateExchange (string alternate) {
-            _args.Add ("alternate-exchange", alternate);
-            return this;
-        }
-
-        public IExchange AsAutoDelete () {
-            AutoDelete = true;
-            return this;
-        }
-
-        public IExchange AsDurable () {
-            Durable = true;
-            return this;
-        }
-
-        public async Task DeclareAsync () {
-            bool exists = await _bunny.ExchangeExistsAsync (Name);
-            if (exists) {
-                return;
-            }
-            IModel channel = null;
-            try {
-                channel = _bunny.Channel (newOne: true);
-
-                await Task.Run (() => {
-                    channel.ExchangeDeclare (Name, ExchangeType, Durable, AutoDelete, _args);
-                });
-            } catch (System.Exception exc) {
-                throw DeclarationException.DeclareFailed (exc, "exchange-declare failed!");
-            } finally {
-                channel.Close ();
-            }
-        }
-
-        internal bool _Internal { get; set; }
-        public IExchange Internal () {
-            _Internal = true;
-            return this;
-        }
+    public DeclareExchange(IBunny bunny, string name, string type) {
+      this.Bunny = bunny;
+      this.Name = name;
+      this.ExchangeType = type;
     }
+
+    internal bool Durable { get; set; }
+    internal bool AutoDelete { get; set; }
+    internal string ExchangeType { get; set; } = "direct";
+
+    public IBunny Bunny { get; }
+
+    public string Name { get; set; }
+
+    public IExchange AlternateExchange(string alternate) {
+      this.args.Add("alternate-exchange", alternate);
+      return this;
+    }
+
+    public IExchange AsAutoDelete() {
+      this.AutoDelete = true;
+      return this;
+    }
+
+    public IExchange AsDurable() {
+      this.Durable = true;
+      return this;
+    }
+
+    public void Declare() {
+      if (this.Bunny.ExchangeExists(this.Name)) {
+        return;
+      }
+
+      IModel channel = null;
+      try {
+        channel = this.Bunny.Channel(true);
+
+        channel.ExchangeDeclare(this.Name, this.ExchangeType, this.Durable, this.AutoDelete, this.args);
+      } catch (Exception exc) {
+        throw DeclarationException.DeclareFailed(exc, "exchange-declare failed!");
+      } finally {
+        channel?.Close();
+      }
+    }
+  }
 }

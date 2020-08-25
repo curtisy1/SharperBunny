@@ -1,13 +1,12 @@
-﻿using System;
-using SharperBunny;
+﻿namespace SharperBunny.Tests.IntegrationTests {
+  using System;
 
-namespace SharperBunny.Tests.IntegrationTests {
-    class Program {
-        static void Main (string[] args) {
-            var pipe = Bunny.ConnectSingleWith ();
-            IBunny bunny = pipe.Connect ();
+  internal static class Program {
+    private static void Main(string[] args) {
+      var pipe = Bunny.ConnectSingleWith();
+      var bunny = pipe.Connect();
 
-            Console.ReadLine ();
-        }
+      Console.ReadLine();
     }
+  }
 }
