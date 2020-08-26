@@ -1,6 +1,5 @@
 namespace SharperBunny.Tests.Connection {
   using FluentAssertions;
-  using RabbitMQ.Client;
   using RabbitMQ.Client.Exceptions;
   using SharperBunny.Connection;
   using SharperBunny.Interfaces;
@@ -26,7 +25,8 @@ namespace SharperBunny.Tests.Connection {
     [Fact]
     public void Connect_WithoutPreviousCalls_ReturnsDefaultConnection() {
       var connectionCluster = new ConnectionCluster();
-
+      Bunny.RetryCount = 0;
+      
       try {
         connectionCluster.Connect(); // will fail because it's not yet implemented
       } catch (BrokerUnreachableException) {
