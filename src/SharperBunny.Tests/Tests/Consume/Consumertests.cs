@@ -113,28 +113,6 @@ namespace SharperBunny.Tests.Consume {
       Assert.Equal((uint)0, count);
     }
 
-    [Fact]
-    public async Task GetReturnsOperationResultFailIfNoMessages() {
-      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
-      var opResult = bunny.Consumer<ConsumeMessage>(get).AsAutoAck().Get(carrot => Task.CompletedTask.Wait());
-
-      Assert.NotNull(opResult);
-      Assert.Equal(OperationState.GetFailed, opResult.State);
-    }
-
-    [Fact]
-    public async Task GetSucceedsIfMessageIsAvailable() {
-      var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
-      var msg = new ConsumeMessage();
-      var bytes = Config.Serialize(msg);
-      bunny.Channel(true).BasicPublish("", get, false, null, bytes);
-      var opResult = bunny.Consumer<ConsumeMessage>(get).AsAutoAck().Get(carrot => Task.CompletedTask.Wait());
-
-      Assert.NotNull(opResult);
-      Assert.Equal(OperationState.Get, opResult.State);
-      Assert.NotNull(opResult.Message.MyText);
-    }
-
     private class EqualityOpResult : IEqualityComparer<OperationResult<ConsumeMessage>> {
       public bool Equals(OperationResult<ConsumeMessage> x, OperationResult<ConsumeMessage> y) {
         return x.State == y.State && x.IsSuccess == y.IsSuccess;
