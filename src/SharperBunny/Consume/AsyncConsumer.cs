@@ -58,30 +58,6 @@ namespace SharperBunny.Consume {
       return Task.FromResult(result);
     }
 
-    public async Task<OperationResult<TMsg>> Get(Func<IAsyncCarrot<TMsg>, Task> handle) {
-      var operationResult = new OperationResult<TMsg>();
-
-      try {
-        var result = this.thisChannel.Channel.BasicGet(this.consumeFromQueue, this.autoAck);
-        if (result != null) {
-          var msg = this.deserialize(result.Body);
-          var carrot = new AsyncCarrot<TMsg>(msg, result.DeliveryTag, this.thisChannel);
-          await handle(carrot);
-          operationResult.IsSuccess = true;
-          operationResult.State = OperationState.Get;
-          operationResult.Message = msg;
-        } else {
-          operationResult.IsSuccess = false;
-          operationResult.State = OperationState.GetFailed;
-        }
-      } catch (Exception ex) {
-        operationResult.IsSuccess = false;
-        operationResult.Error = ex;
-      }
-
-      return operationResult;
-    }
-
     public IAsyncConsumer<TMsg> Callback(Func<IAsyncCarrot<TMsg>, Task> callback) {
       this.receive = callback;
       return this;

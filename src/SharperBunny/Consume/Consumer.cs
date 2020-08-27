@@ -21,30 +21,6 @@ namespace SharperBunny.Consume {
       return this;
     }
 
-    public OperationResult<TMsg> Get(Action<ICarrot<TMsg>> handle) {
-      var operationResult = new OperationResult<TMsg>();
-
-      try {
-        var result = this.thisChannel.Channel.BasicGet(this.consumeFromQueue, this.autoAck);
-        if (result != null) {
-          var msg = this.deserialize(result.Body);
-          var carrot = new Carrot<TMsg>(msg, result.DeliveryTag, this.thisChannel);
-          handle(carrot);
-          operationResult.IsSuccess = true;
-          operationResult.State = OperationState.Get;
-          operationResult.Message = msg;
-        } else {
-          operationResult.IsSuccess = false;
-          operationResult.State = OperationState.GetFailed;
-        }
-      } catch (Exception ex) {
-        operationResult.IsSuccess = false;
-        operationResult.Error = ex;
-      }
-
-      return operationResult;
-    }
-
     public IConsumer<TMsg> AckBehaviour(Action<ICarrot<TMsg>> ackBehaviour) {
       this.autoAck = false;
       this.ackBehaviour = ackBehaviour;
