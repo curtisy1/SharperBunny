@@ -60,7 +60,6 @@ namespace SharperBunny.Consume {
           result.State = OperationState.ConsumerAttached;
           result.IsSuccess = true;
           result.Message = default;
-          return result;
         } catch (Exception ex) {
           result.IsSuccess = false;
           result.Error = ex;
@@ -90,7 +89,7 @@ namespace SharperBunny.Consume {
         carrot = new Carrot<TMsg>(message, args.DeliveryTag, this.thisChannel) { MessageProperties = args.BasicProperties };
 
         this.receive(carrot);
-        if (this.autoAck == false) {
+        if (!this.autoAck) {
           this.ackBehaviour(carrot);
         }
       } catch (Exception ex) {

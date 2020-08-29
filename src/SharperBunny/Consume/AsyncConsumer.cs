@@ -109,7 +109,7 @@ namespace SharperBunny.Consume {
         carrot = new AsyncCarrot<TMsg>(message, args.DeliveryTag, this.thisChannel) { MessageProperties = args.BasicProperties };
 
         await this.receive(carrot);
-        if (this.autoAck == false) {
+        if (!this.autoAck) {
           await this.ackBehaviour(carrot);
         }
       } catch (Exception ex) {
