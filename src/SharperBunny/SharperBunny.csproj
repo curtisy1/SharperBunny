@@ -5,6 +5,7 @@
     <Version>1.0.1</Version>
     <RepositoryUrl>https://github.com/curtisy1/SharperBunny</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
