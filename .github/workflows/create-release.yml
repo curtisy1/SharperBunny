@@ -25,6 +25,6 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Pack
-      run: dotnet pack -c Release SharperBunny
+      run: dotnet pack -c Release src/SharperBunny/SharperBunny.csproj
     - name: Publish
-      run: dotnet nuget push SharperBunny/bin/Release/*.nupkg
+      run: dotnet nuget push src/SharperBunny/bin/Release/*.nupkg
