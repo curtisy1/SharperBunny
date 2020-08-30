@@ -1,11 +1,15 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("SharperBunny.Tests")]
+
 namespace SharperBunny.Connection {
+  using System.Linq;
   using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class ConnectionCluster : IConnectionCluster {
+    private const string defaultConnection = "amqp://guest:guest@localhost:5672/";
+
     public IConnectionCluster AddNode(string amqpUri) {
       Bunny.Endpoints.Add(amqpUri.ParseEndpoint());
       return this;
@@ -22,6 +26,10 @@ namespace SharperBunny.Connection {
     }
 
     public IBunny Connect() {
+      if (!Bunny.Endpoints.Any()) {
+        Bunny.Endpoints.Add(defaultConnection.ParseEndpoint());
+      }
+
       return Bunny.Connect();
     }
 

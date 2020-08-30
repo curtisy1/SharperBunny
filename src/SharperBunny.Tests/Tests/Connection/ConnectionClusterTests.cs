@@ -14,6 +14,7 @@ namespace SharperBunny.Tests.Connection {
       connectionCluster.AddNode(basicAmqp);
 
       Bunny.Endpoints.Should().HaveCount(1).And.Contain(x => x.HostName == "localhost");
+      Bunny.Endpoints.Clear();
     }
 
     [Fact]
@@ -22,12 +23,13 @@ namespace SharperBunny.Tests.Connection {
       Bunny.RetryCount = 0;
       
       try {
-        connectionCluster.Connect(); // will fail because it's not yet implemented
+        connectionCluster.Connect();
       } catch (BrokerUnreachableException) {
         // this is expected, we don't want to connect anyway
       }
 
       Bunny.Endpoints.Should().HaveCount(1).And.Contain(x => x.HostName == "localhost");
+      Bunny.Endpoints.Clear();
     }
   }
 }
