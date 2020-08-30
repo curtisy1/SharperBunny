@@ -6,39 +6,22 @@ namespace SharperBunny.Declare {
   using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
-  public class DeclareExchange : IExchange {
+  public class DeclareExchange : DeclareBase, IExchange {
     private readonly Dictionary<string, object> args = new Dictionary<string, object>();
 
-    public DeclareExchange(IBunny bunny, string name, string type) {
-      this.Bunny = bunny;
-      this.Name = name;
+    public DeclareExchange(IBunny bunny, string name, string type)
+      : base(bunny, name) {
       this.ExchangeType = type;
     }
 
-    internal bool Durable { get; set; }
-    internal bool AutoDelete { get; set; }
     internal string ExchangeType { get; set; } = "direct";
-
-    public IBunny Bunny { get; }
-
-    public string Name { get; set; }
 
     public IExchange AlternateExchange(string alternate) {
       this.args.Add("alternate-exchange", alternate);
       return this;
     }
 
-    public IExchange AsAutoDelete() {
-      this.AutoDelete = true;
-      return this;
-    }
-
-    public IExchange AsDurable() {
-      this.Durable = true;
-      return this;
-    }
-
-    public void Declare() {
+    public override void Declare() {
       if (this.Bunny.ExchangeExists(this.Name)) {
         return;
       }

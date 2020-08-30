@@ -7,25 +7,20 @@ namespace SharperBunny.Declare {
   using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
-  public class DeclareQueue : IQueue {
+  public class DeclareQueue : DeclareBase, IQueue {
     private readonly Dictionary<string, object> arguments = new Dictionary<string, object>();
     private bool wasDeclared;
 
-    public DeclareQueue(IBunny bunny, string name) {
-      this.Name = name;
-      this.Bunny = bunny;
-    }
+    public DeclareQueue(IBunny bunny, string name)
+      : base(bunny, name) { }
 
-    private bool Durable { get; set; } = true;
     public (string ex, string rKey)? BindingKey { get; set; }
-    private bool AutoDelete { get; set; }
+    
     private bool Exclusive { get; set; }
-    public IBunny Bunny { get; set; }
-    public string Name { get; }
 
     public string RoutingKey => this.BindingKey.HasValue ? this.BindingKey.Value.rKey : this.Name;
 
-    public void Declare() {
+    public override void Declare() {
       if (this.wasDeclared) {
         return;
       }
@@ -37,8 +32,7 @@ namespace SharperBunny.Declare {
       IModel channel = null;
       try {
         channel = this.Bunny.Channel(true);
-
-        this.Declare(channel);
+        channel.QueueDeclare(this.Name, this.Durable, this.Exclusive, this.AutoDelete, this.arguments.Any() ? this.arguments : null);
         this.Bind(channel);
       } catch (Exception exc) {
         throw DeclarationException.DeclareFailed(exc, "queue-declare failed");
@@ -53,11 +47,6 @@ namespace SharperBunny.Declare {
       return this;
     }
 
-    public IQueue AsAutoDelete() {
-      this.AutoDelete = true;
-      return this;
-    }
-
     public IQueue Bind(string exchangeName, string routingKey = "") {
       if (exchangeName == null) {
         throw DeclarationException.Argument(new ArgumentException("exchangename must not be null"));
@@ -65,19 +54,6 @@ namespace SharperBunny.Declare {
 
       this.BindingKey = (exchangeName, routingKey);
       return this;
-    }
-
-    public IQueue AsDurable() {
-      this.Durable = true;
-      return this;
-    }
-
-    private void Declare(IModel channel) {
-      channel.QueueDeclare(this.Name,
-                           this.Durable,
-                           this.Exclusive,
-                           this.AutoDelete,
-                           this.arguments.Any() ? this.arguments : null);
     }
 
     private void Bind(IModel channel) {

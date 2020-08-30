@@ -7,7 +7,7 @@ namespace SharperBunny.Tests.Declaration {
   public class DeclareBaseTests {
     [Fact]
     public void DeclareBase_ThrowsException() {
-      var declareBase = new DeclareBase();
+      var declareBase = new DeclareBase(default);
 
       declareBase.Invoking(b => b.Declare()).Should().Throw<DeclarationException>();
     }

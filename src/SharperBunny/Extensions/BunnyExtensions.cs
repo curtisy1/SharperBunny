@@ -62,7 +62,7 @@ namespace SharperBunny.Extensions {
     ///   Interface for building Queues, Exchanges, Bindings and so on
     /// </summary>
     public static IDeclare Setup(this IBunny bunny) {
-      return new DeclareBase { Bunny = bunny };
+      return new DeclareBase(bunny);
     }
 
     internal static bool QueueExists(this IBunny bunny, string name) {
