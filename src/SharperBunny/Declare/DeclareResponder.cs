@@ -1,6 +1,5 @@
-namespace SharperBunny.Consume {
+namespace SharperBunny.Declare {
   using System;
-  using System.Threading.Tasks;
   using SharperBunny.Configuration;
   using SharperBunny.Connection;
   using SharperBunny.Exceptions;
@@ -61,13 +60,13 @@ namespace SharperBunny.Consume {
       // consume
       var forceDeclare = this.bunny.Setup()
         .Queue(this.consumeFromQueue)
-        .AsDurable()
-        .Bind(this.rpcExchange, this.consumeFromQueue);
+        .Bind(this.rpcExchange, this.consumeFromQueue)
+        .AsDurable();
 
       var consumeResult = this.bunny.Consumer<TRequest>(this.consumeFromQueue)
         .DeserializeMessage(this.deserialize)
         .Callback(Receiver)
-        .StartConsuming(forceDeclare);
+        .StartConsuming(forceDeclare as IQueue);
 
       if (consumeResult.IsSuccess) {
         result.IsSuccess = true;

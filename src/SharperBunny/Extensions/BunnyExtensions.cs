@@ -1,5 +1,6 @@
 namespace SharperBunny.Extensions {
   using System;
+  using RabbitMQ.Client;
   using RabbitMQ.Client.Exceptions;
   using SharperBunny.Connection;
   using SharperBunny.Consume;
@@ -61,12 +62,13 @@ namespace SharperBunny.Extensions {
     ///   Interface for building Queues, Exchanges, Bindings and so on
     /// </summary>
     public static IDeclare Setup(this IBunny bunny) {
-      return new DeclareBase { Bunny = bunny };
+      return new DeclareBase(bunny);
     }
 
     internal static bool QueueExists(this IBunny bunny, string name) {
+      IModel channel = null;
       try {
-        var channel = bunny.Channel(true);
+        channel = bunny.Channel(true);
         channel.QueueDeclarePassive(name);
 
         return true;
@@ -74,12 +76,15 @@ namespace SharperBunny.Extensions {
         return false;
       } catch (Exception ex) {
         throw DeclarationException.DeclareFailed(ex);
+      } finally {
+        channel?.Close();
       }
     }
 
     internal static bool ExchangeExists(this IBunny bunny, string name) {
+      IModel channel = null;
       try {
-        var channel = bunny.Channel(true);
+        channel = bunny.Channel(true);
         channel.ExchangeDeclarePassive(name);
 
         return true;
@@ -87,6 +92,8 @@ namespace SharperBunny.Extensions {
         return false;
       } catch (Exception ex) {
         throw DeclarationException.DeclareFailed(ex);
+      } finally {
+        channel?.Close();
       }
     }
 

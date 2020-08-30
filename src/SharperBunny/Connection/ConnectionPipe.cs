@@ -1,5 +1,9 @@
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("SharperBunny.Tests")]
 namespace SharperBunny.Connection {
   using System;
+  using System.Runtime.CompilerServices;
   using SharperBunny.Interfaces;
 
   internal class ConnectionPipe : IConnectionPipe {

@@ -21,30 +21,6 @@ namespace SharperBunny.Consume {
       return this;
     }
 
-    public OperationResult<TMsg> Get(Action<ICarrot<TMsg>> handle) {
-      var operationResult = new OperationResult<TMsg>();
-
-      try {
-        var result = this.thisChannel.Channel.BasicGet(this.consumeFromQueue, this.autoAck);
-        if (result != null) {
-          var msg = this.deserialize(result.Body);
-          var carrot = new Carrot<TMsg>(msg, result.DeliveryTag, this.thisChannel);
-          handle(carrot);
-          operationResult.IsSuccess = true;
-          operationResult.State = OperationState.Get;
-          operationResult.Message = msg;
-        } else {
-          operationResult.IsSuccess = false;
-          operationResult.State = OperationState.GetFailed;
-        }
-      } catch (Exception ex) {
-        operationResult.IsSuccess = false;
-        operationResult.Error = ex;
-      }
-
-      return operationResult;
-    }
-
     public IConsumer<TMsg> AckBehaviour(Action<ICarrot<TMsg>> ackBehaviour) {
       this.autoAck = false;
       this.ackBehaviour = ackBehaviour;
@@ -84,7 +60,6 @@ namespace SharperBunny.Consume {
           result.State = OperationState.ConsumerAttached;
           result.IsSuccess = true;
           result.Message = default;
-          return result;
         } catch (Exception ex) {
           result.IsSuccess = false;
           result.Error = ex;
@@ -114,7 +89,7 @@ namespace SharperBunny.Consume {
         carrot = new Carrot<TMsg>(message, args.DeliveryTag, this.thisChannel) { MessageProperties = args.BasicProperties };
 
         this.receive(carrot);
-        if (this.autoAck == false) {
+        if (!this.autoAck) {
           this.ackBehaviour(carrot);
         }
       } catch (Exception ex) {

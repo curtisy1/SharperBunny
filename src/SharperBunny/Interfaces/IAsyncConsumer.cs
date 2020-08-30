@@ -10,12 +10,6 @@ namespace SharperBunny.Interfaces {
     Task<OperationResult<TMsg>> StartConsuming(IQueue force = null);
 
     /// <summary>
-    ///   Basic.Get Functionality. Aka Pull API
-    ///   Leave out the carrot.SendAckAsync if you use AutoAck!
-    /// </summary>
-    Task<OperationResult<TMsg>> Get(Func<IAsyncCarrot<TMsg>, Task> carrot);
-
-    /// <summary>
     ///   Define what your consumer does with the message. Carrot helps to ack/nack messages
     /// </summary>
     IAsyncConsumer<TMsg> Callback(Func<IAsyncCarrot<TMsg>, Task> callback);
