@@ -37,7 +37,7 @@ namespace SharperBunny.Extensions {
     ///   Enter Queue DeclarationMode
     /// </summary>
     public static IQueue Queue(this IDeclare declare, string name) {
-      if (declare is not DeclareBase) {
+      if (!(declare is DeclareBase)) {
         throw DeclarationException.WrongType(typeof(DeclareBase), declare);
       }
 
