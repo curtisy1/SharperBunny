@@ -78,7 +78,7 @@ namespace SharperBunny.Publish {
     public IRequest<TRequest, TResponse> WithQueueDeclare(string queue = null, string exchange = null, string routingKey = null) {
       var name = queue ?? typeof(TRequest).FullName;
       var rKey = routingKey ?? typeof(TRequest).FullName;
-      this.queueDeclare = this.bunny.Setup().Queue(name).Bind(exchange ?? this.toExchange, rKey).AsDurable();
+      this.queueDeclare = (IQueue)this.bunny.Setup().Queue(name).Bind(exchange ?? this.toExchange, rKey).AsDurable();
 
       return this;
     }
