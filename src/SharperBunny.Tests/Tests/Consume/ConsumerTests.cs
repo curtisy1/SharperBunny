@@ -1,24 +1,12 @@
 namespace SharperBunny.Tests.Consume {
-  using System;
-  using System.Collections.Generic;
-  using System.Text.Json;
   using System.Threading.Tasks;
   using FluentAssertions;
   using NSubstitute;
-  using NSubstitute.ReceivedExtensions;
-  using SharperBunny.Configuration;
   using SharperBunny.Consume;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
-  using SharperBunny.Tests.Connection;
   using Xunit;
 
   public class ConsumerTests {
-    private const string get = "get-queue";
-    private const string queue = "consume-queue";
-    private const string nackQueue = "nack-no-requeue";
-    private const string nackReQueue = "nack-requeue";
-
     [Fact]
     public void Consumer_StartConsuming_WithDefaults_TakesDefaultCallbacks() {
       var bunny = Substitute.For<IBunny>();

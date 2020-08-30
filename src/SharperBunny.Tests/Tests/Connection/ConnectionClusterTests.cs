@@ -2,22 +2,16 @@ namespace SharperBunny.Tests.Connection {
   using FluentAssertions;
   using RabbitMQ.Client.Exceptions;
   using SharperBunny.Connection;
-  using SharperBunny.Interfaces;
   using Xunit;
 
   public class ConnectionClusterTests {
-    private static readonly string VirtualHost = "unittests";
-    internal static string BasicAmqp => $"amqp://guest:guest@localhost:5672/{VirtualHost}";
-
-    internal static IBunny Connect() {
-      return Bunny.ConnectSingle(BasicAmqp);
-    }
+    private const string basicAmqp = "amqp://guest:guest@localhost:5672";
 
     [Fact]
     public void AddNode_AddsNewUriToEndpoints() {
       var connectionCluster = new ConnectionCluster();
       
-      connectionCluster.AddNode(BasicAmqp);
+      connectionCluster.AddNode(basicAmqp);
 
       Bunny.Endpoints.Should().HaveCount(1).And.Contain(x => x.HostName == "localhost");
     }

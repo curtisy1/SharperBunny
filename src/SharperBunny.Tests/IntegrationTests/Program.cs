@@ -8,7 +8,13 @@
 
       // TODO: The rest is pretty much an integration test.
       // Migrate once remaining methods are covered
+      // Regions are the original test locations
 
+      #region Consume/ConsumerTests
+      // private const string get = "get-queue";
+      // private const string queue = "consume-queue";
+      // private const string nackQueue = "nack-no-requeue";
+      // private const string nackReQueue = "nack-requeue";
       // [Fact]
       // public async Task ConsumerAttachReturnsOperationResult() {
       //   await this.ConsumeGeneric(async carrot => {
@@ -172,6 +178,252 @@
       //
       //       Assert.Equal(1, 1);
       //     }
+      
+      #endregion
+      
+      #region Declaration/DeleteTests
+      // [Fact]
+      // public async Task DeclareAndDeleteQueueNotExistsAfterWards() {
+      //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+      //   var declare = bunny.Setup()
+      //     .Queue("to-delete");
+      //
+      //   declare.Declare();
+      //   var exists = declare.QueueExists(declare.Name);
+      //   Assert.True(exists);
+      //   declare.DeleteQueue(declare.Name);
+      //   exists = declare.QueueExists(declare.Name);
+      //   Assert.False(exists);
+      // }
+      //
+      // [Fact]
+      // public async Task DeclareAndDeleteExchangeNotExistsAfterWards() {
+      //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+      //   var declare = bunny.Setup()
+      //     .Exchange("to-delete-ex", "fanout");
+      //
+      //   declare.Declare();
+      //   var exists = declare.ExchangeExists(declare.Name);
+      //   Assert.True(exists);
+      //   declare.DeleteExchange(declare.Name);
+      //   exists = declare.ExchangeExists(declare.Name);
+      //   Assert.False(exists);
+      // }
+      
+      #endregion
+      
+      #region Producer/PublisherTests
+      // [Fact]
+    // public async Task PublisherSimplySendsWithoutQueueReturnsFailure() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //   var publisher = bunny.Publisher<TestMessage>(this.exchange);
+    //
+    //   var result = publisher.Send(new TestMessage());
+    //
+    //   Assert.True(result.IsSuccess);
+    //   bunny.Dispose();
+    // }
+    //
+    // [Fact]
+    // public async Task PublisherSimplySendsWitQueueReturnsSuccess() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //   var publisher = bunny.Publisher<TestMessage>(this.exchange);
+    //
+    //   var result = publisher
+    //     .WithQueueDeclare()
+    //     .Send(new TestMessage());
+    //
+    //   var success = bunny.Setup().DeleteQueue(typeof(TestMessage).FullName, true);
+    //
+    //   Assert.True(result.IsSuccess);
+    //   Assert.True(success);
+    //   bunny.Dispose();
+    // }
+    //
+    // [Fact]
+    // public async Task ForceCreatesTheExchangeIfNotExists() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //   var publisher = bunny.Publisher<TestMessage>("test-exchange");
+    //
+    //   var result = publisher.Send(new TestMessage(), true);
+    //
+    //   Assert.True(result.IsSuccess);
+    //   var removedExchange = bunny.Setup().DeleteExchange("test-exchange", true);
+    //   Assert.True(removedExchange);
+    //   bunny.Dispose();
+    // }
+    //
+    // [Fact]
+    // public async Task ConfirmsAndAcksWork() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //   var queue = bunny.Setup()
+    //     .Queue("constraint")
+    //     .MaxLength(1)
+    //     .QueueExpiry(1500)
+    //     .Bind("amq.direct", "constraint-key")
+    //     .OverflowReject();
+    //
+    //   var isNacked = false;
+    //   var isAcked = false;
+    //   var publisher = bunny.Publisher<TestMessage>("amq.direct");
+    //   Func<BasicNackEventArgs, Task> nacker = ea => {
+    //     isNacked = true;
+    //     return Task.CompletedTask;
+    //   };
+    //   Func<BasicAckEventArgs, Task> acker = ea => {
+    //     isAcked = true;
+    //     return Task.CompletedTask;
+    //   };
+    //
+    //   publisher.WithQueueDeclare(queue)
+    //     .WithConfirm(acker, nacker)
+    //     .WithRoutingKey("constraint-key")
+    //     .Send(new TestMessage { Text = "Confirm-1st" });
+    //
+    //   publisher.WithQueueDeclare(queue)
+    //     .WithConfirm(acker, nacker)
+    //     .Send(new TestMessage { Text = "Confirm-2nd" });
+    //
+    //   Assert.True(isAcked);
+    //   Assert.True(isNacked);
+    //   bunny.Dispose();
+    // }
+    //
+    // [Fact]
+    // public async Task MandatoryFailsWithoutQueue() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //
+    //   var isReturned = false;
+    //   var publisher = bunny.Publisher<TestMessage>("amq.direct");
+    //   Func<BasicReturnEventArgs, Task> nacker = ea => {
+    //     isReturned = true;
+    //     return Task.CompletedTask;
+    //   };
+    //
+    //   publisher.AsMandatory(nacker)
+    //     .WithRoutingKey("not-any-bound-queue")
+    //     .Send(new TestMessage());
+    //
+    //   await Task.Delay(500);
+    //   Assert.True(isReturned);
+    //   bunny.Dispose();
+    // }
+    //
+    // [Fact]
+    // public async Task MandatoryWorksWithQueue() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //
+    //   var isReturned = true;
+    //   var publisher = bunny.Publisher<TestMessage>("amq.direct");
+    //   Func<BasicReturnEventArgs, Task> nacker = ea => {
+    //     isReturned = false;
+    //     return Task.CompletedTask;
+    //   };
+    //
+    //   publisher.AsMandatory(nacker)
+    //     .WithQueueDeclare()
+    //     .Send(new TestMessage { Text = "Mandatory-succeeds" });
+    //
+    //   var removed = bunny.Setup().DeleteQueue(typeof(TestMessage).FullName, true);
+    //
+    //   Assert.True(isReturned);
+    //   bunny.Dispose();
+    // }
+    //
+    // [Fact]
+    // public async Task MultiplePublishOnSinglePublisher() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //   var publisher = bunny.Publisher<TestMessage>("amq.direct");
+    //
+    //   var queueName = "polymorph-queue";
+    //   publisher.WithQueueDeclare(queueName, "poly")
+    //     .Send(new OtherMessage());
+    //   publisher.Send(new YetAnotherMessage());
+    //   await Task.Delay(150);
+    //   var count = bunny.Channel().MessageCount(queueName);
+    //
+    //   Assert.Equal(2, (int)count);
+    //   bunny.Setup().DeleteQueue(queueName, true);
+    // }
+    //
+    // [Fact]
+    // public async Task OverWriteRoutingKeySendsToDifferentQueuesEachTime() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //   var publisher = bunny.Publisher<TestMessage>("amq.direct");
+    //
+    //   var queueName = "polymorph-queue-other";
+    //   var queueNameYetOther = "polymorph-queue-yet-another";
+    //   publisher.WithQueueDeclare(queueName, "poly")
+    //     .Send(new OtherMessage());
+    //   publisher.WithQueueDeclare(queueNameYetOther, "poly-2")
+    //     .WithRoutingKey("poly-2")
+    //     .Send(new YetAnotherMessage());
+    //
+    //   var otherCount = bunny.Channel().MessageCount(queueName);
+    //   var yetOtherCount = bunny.Channel().MessageCount(queueNameYetOther);
+    //
+    //   Assert.Equal(1, (int)otherCount);
+    //   Assert.Equal(1, (int)yetOtherCount);
+    //
+    //   bunny.Setup().DeleteQueue(queueName, true);
+    //   bunny.Setup().DeleteQueue(queueNameYetOther, true);
+    // }
+    
+    // private readonly string exchange = ""; // default --> " "
+    //
+    //
+    //
+    // public class TestMessage {
+    //   public string Text { get; set; } = "Test";
+    //   public int Number { get; set; } = 42;
+    // }
+    //
+    // public class OtherMessage : TestMessage { }
+    //
+    // public class YetAnotherMessage : OtherMessage { }
+    
+    #endregion
+    
+    #region Rpc/RequestTests
+    // [Fact]
+    // public async Task DirectReplyWorks() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //   var rpcExchange = "rpc-exchange";
+    //
+    //   bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => new MyResponse())
+    //     .StartResponding();
+    //
+    //   var result = bunny.Request<MyRequest, MyResponse>(rpcExchange)
+    //     .Request(new MyRequest(), true);
+    //
+    //   await Task.Delay(500);
+    //
+    //   Assert.True(result.IsSuccess);
+    //   Assert.NotNull(result.Message);
+    // }
+    //
+    // [Fact]
+    // public async Task WithTemporaryQueueWorksAlso() {
+    //   var bunny = Bunny.ConnectSingle(ConnectionClusterTests.BasicAmqp);
+    //   var rpcExchange = "rpc-exchange";
+    //
+    //   bunny.Respond<MyRequest, MyResponse>(rpcExchange, rq => new MyResponse())
+    //     .StartResponding();
+    //
+    //   var result = bunny.Request<MyRequest, MyResponse>(rpcExchange)
+    //     .Request(new MyRequest(), true);
+    //
+    //   await Task.Delay(500);
+    //
+    //   Assert.True(result.IsSuccess);
+    //   Assert.NotNull(result.Message);
+    // }
+    
+    // private class MyRequest { }
+    //
+    // private class MyResponse { }
+    
+    #endregion
 
       Console.ReadLine();
     }
