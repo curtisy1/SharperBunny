@@ -6,7 +6,7 @@ namespace SharperBunny.Connection {
   /// <summary>
   ///   Encapsulates reconnect
   /// </summary>
-  public class PermanentChannel : IDisposable {
+  public class PermanentChannel : IPermanentChannel {
     private readonly IBunny bunny;
     private bool disposedValue;
     private IModel model;

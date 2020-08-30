@@ -1,6 +1,5 @@
-namespace SharperBunny.Consume {
+namespace SharperBunny.Declare {
   using System;
-  using System.Threading.Tasks;
   using SharperBunny.Configuration;
   using SharperBunny.Connection;
   using SharperBunny.Exceptions;

@@ -1,12 +1,11 @@
 namespace SharperBunny.Consume {
   using RabbitMQ.Client;
-  using SharperBunny.Connection;
   using SharperBunny.Interfaces;
 
   public class CarrotBase<TMsg> : ICarrotBase<TMsg> {
-    protected readonly PermanentChannel thisChannel;
+    protected readonly IPermanentChannel thisChannel;
 
-    protected CarrotBase(TMsg message, ulong deliveryTag, PermanentChannel thisChannel) {
+    protected CarrotBase(TMsg message, ulong deliveryTag, IPermanentChannel thisChannel) {
       this.Message = message;
       this.DeliveryTag = deliveryTag;
       this.thisChannel = thisChannel;
