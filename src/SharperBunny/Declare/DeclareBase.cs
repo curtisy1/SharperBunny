@@ -23,13 +23,13 @@ namespace SharperBunny.Declare {
       this.Name = name;
     }
 
-    public virtual IDeclare AsDurable() {
-      this.Durable = true;
+    public virtual IDeclare SetDurable(bool durable = true) {
+      this.Durable = durable;
       return this;
     }
 
-    public virtual IDeclare AsAutoDelete() {
-      this.AutoDelete = true;
+    public virtual IDeclare SetAutoDelete(bool autoDelete = false) {
+      this.AutoDelete = autoDelete;
       return this;
     }
 

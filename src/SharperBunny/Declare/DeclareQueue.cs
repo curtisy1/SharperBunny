@@ -42,6 +42,11 @@ namespace SharperBunny.Declare {
       }
     }
 
+    public IQueue SetExclusive(bool exclusive = false) {
+      this.Exclusive = exclusive;
+      return this;
+    }
+
     public IQueue AddTag(string key, object value) {
       this.arguments.Add(key, value);
       return this;
