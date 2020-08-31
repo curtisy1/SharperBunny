@@ -10,12 +10,12 @@ namespace SharperBunny.Interfaces {
     /// <summary>
     ///   Exchange defined as autodelete
     /// </summary>
-    IDeclare AsAutoDelete();
+    IDeclare SetAutoDelete(bool autoDelete = false);
 
     /// <summary>
     ///   Durable Exchanges will survive a broker restart
     /// </summary>
-    IDeclare AsDurable();
+    IDeclare SetDurable(bool durable = true);
 
     /// <summary>
     ///   Execute the Declaration

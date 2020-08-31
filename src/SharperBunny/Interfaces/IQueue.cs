@@ -14,5 +14,7 @@ namespace SharperBunny.Interfaces {
     ///   Add any tag and its value. Better use the extension methods for this.
     /// </summary>
     IQueue AddTag(string tag, object value);
+
+    IQueue SetExclusive(bool exclusive = false);
   }
 }

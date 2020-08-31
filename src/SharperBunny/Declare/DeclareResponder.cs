@@ -61,7 +61,7 @@ namespace SharperBunny.Declare {
       var forceDeclare = this.bunny.Setup()
         .Queue(this.consumeFromQueue)
         .Bind(this.rpcExchange, this.consumeFromQueue)
-        .AsDurable();
+        .SetDurable();
 
       var consumeResult = this.bunny.Consumer<TRequest>(this.consumeFromQueue)
         .DeserializeMessage(this.deserialize)
