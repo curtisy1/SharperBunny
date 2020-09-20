@@ -13,7 +13,7 @@ namespace SharperBunny.Tests.Connection {
       
       connectionCluster.AddNode(basicAmqp);
 
-      Bunny.Endpoints.Should().HaveCount(1).And.Contain(x => x.HostName == "localhost");
+      Bunny.Endpoints.Should().HaveCount(1).And.Contain(x => x == "localhost");
       Bunny.Endpoints.Clear();
     }
 
@@ -28,7 +28,7 @@ namespace SharperBunny.Tests.Connection {
         // this is expected, we don't want to connect anyway
       }
 
-      Bunny.Endpoints.Should().HaveCount(1).And.Contain(x => x.HostName == "localhost");
+      Bunny.Endpoints.Should().HaveCount(1).And.Contain(x => x == "localhost");
       Bunny.Endpoints.Clear();
     }
   }

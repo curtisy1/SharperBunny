@@ -34,12 +34,17 @@ namespace SharperBunny.Declare {
         channel = this.Bunny.Channel(true);
         channel.QueueDeclare(this.Name, this.Durable, this.Exclusive, this.AutoDelete, this.arguments.Any() ? this.arguments : null);
         this.Bind(channel);
+        this.wasDeclared = true;
       } catch (Exception exc) {
         throw DeclarationException.DeclareFailed(exc, "queue-declare failed");
       } finally {
         channel?.Close();
-        this.wasDeclared = true;
       }
+    }
+
+    public IQueue SetExclusive(bool exclusive = false) {
+      this.Exclusive = exclusive;
+      return this;
     }
 
     public IQueue AddTag(string key, object value) {
