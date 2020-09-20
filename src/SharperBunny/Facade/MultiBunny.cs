@@ -8,18 +8,16 @@ namespace SharperBunny.Facade {
   ///   Encapsulates the cluster connect
   /// </summary>
   public class MultiBunny : IBunny {
-    private readonly IList<AmqpTcpEndpoint> endpoints;
     private readonly IConnectionFactory factory;
     private readonly List<IModel> models = new List<IModel>();
 
     private IConnection connection;
     private bool disposedValue;
 
-    public MultiBunny(IConnectionFactory factory, IList<AmqpTcpEndpoint> endpoints) {
+    public MultiBunny(IConnectionFactory factory) {
       this.factory = factory;
-      this.endpoints = endpoints;
 
-      this.connection = factory.CreateConnection(endpoints);
+      this.connection = factory.CreateConnection();
     }
 
     public IModel Channel(bool newOne = false) {
@@ -50,7 +48,7 @@ namespace SharperBunny.Facade {
 
     private void SetConnected() {
       if (!this.connection.IsOpen) {
-        this.connection = this.factory.CreateConnection(this.endpoints);
+        this.connection = this.factory.CreateConnection();
       }
     }
 

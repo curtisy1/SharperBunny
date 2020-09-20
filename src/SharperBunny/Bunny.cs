@@ -11,7 +11,7 @@ namespace SharperBunny {
   using SharperBunny.Interfaces;
 
   public static class Bunny {
-    internal static readonly IList<AmqpTcpEndpoint> Endpoints = new List<AmqpTcpEndpoint>();
+    internal static readonly IList<string> Endpoints = new List<string>();
     internal static bool UseAsyncEvents { get; set; }
     internal static int RetryCount { get; set; } = 3;
     internal static int RetryPauseInMs { get; set; } = 1500;
@@ -21,7 +21,7 @@ namespace SharperBunny {
     /// </summary>
     public static IBunny ConnectSingle(ConnectionParameters parameters, bool useAsync = false) {
       Endpoints.Clear();
-      Endpoints.Add(parameters.ToString().ParseEndpoint());
+      Endpoints.Add(parameters.ToString());
       UseAsyncEvents = useAsync;
       return Connect();
     }
@@ -31,7 +31,7 @@ namespace SharperBunny {
     /// </summary>
     public static IBunny ConnectSingle(string amqpUri, bool useAsync = false) {
       Endpoints.Clear();
-      Endpoints.Add(amqpUri.ParseEndpoint());
+      Endpoints.Add(amqpUri);
       UseAsyncEvents = useAsync;
       return Connect();
     }
@@ -51,11 +51,15 @@ namespace SharperBunny {
     }
 
     internal static IBunny Connect() {
-      var factory = new ConnectionFactory { DispatchConsumersAsync = UseAsyncEvents };
+      var factory = new ConnectionFactory {
+        DispatchConsumersAsync = UseAsyncEvents,
+        Uri = new Uri(Endpoints.FirstOrDefault() ?? "amqp://guest:guest@localhost:5672"),
+      };
       var count = 0;
+      
       while (count <= RetryCount) {
         try {
-          return new MultiBunny(factory, Endpoints);
+          return new MultiBunny(factory);
         } catch {
           count++;
           Thread.Sleep(RetryPauseInMs);
