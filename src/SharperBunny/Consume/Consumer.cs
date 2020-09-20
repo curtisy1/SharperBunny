@@ -3,7 +3,7 @@ namespace SharperBunny.Consume {
   using RabbitMQ.Client.Events;
   using SharperBunny.Interfaces;
 
-  public class Consumer<TMsg> : ConsumerBase, IConsumer<TMsg> {
+  public class Consumer<TMsg> : ConsumerBase<TMsg>, IConsumer<TMsg> {
     private Action<ICarrot<TMsg>> ackBehaviour;
     private EventingBasicConsumer consumer;
     private Func<ReadOnlyMemory<byte>, TMsg> deserialize;
@@ -11,6 +11,7 @@ namespace SharperBunny.Consume {
     private Action<ICarrot<TMsg>> receive;
 
     public Consumer(IBunny bunny, string fromQueue) : base(bunny, fromQueue) {
+      this.deserialize = this.InternalDeserialize;
       this.receive = carrot => carrot.SendAck();
       this.ackBehaviour = carrot => carrot.SendAck();
       this.nackBehaviour = carrot => carrot.SendNack(withRequeue: true);

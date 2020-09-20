@@ -1,10 +1,12 @@
 namespace SharperBunny.Consume {
   using System;
   using System.Collections.Generic;
+  using System.Text;
+  using System.Text.Json;
   using SharperBunny.Connection;
   using SharperBunny.Interfaces;
 
-  public class ConsumerBase : IConsumerBase, IDisposable {
+  public class ConsumerBase<TMsg> : IConsumerBase, IDisposable {
     protected internal readonly Dictionary<string, object> arguments = new Dictionary<string, object>();
     protected readonly IBunny bunny;
     protected readonly PermanentChannel thisChannel;
@@ -35,6 +37,10 @@ namespace SharperBunny.Consume {
       }
 
       this.disposedValue = true;
+    }
+    
+    protected virtual TMsg InternalDeserialize(ReadOnlyMemory<byte> message) {
+      return JsonSerializer.Deserialize<TMsg>(Encoding.UTF8.GetString(message.Span));
     }
   }
 }
