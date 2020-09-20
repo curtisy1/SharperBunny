@@ -16,7 +16,7 @@ namespace SharperBunny.Tests.Connection {
         // this is expected, we don't want to connect anyway
       }
 
-      Bunny.Endpoints.Should().HaveCount(1).And.Contain(e => e.HostName == "localhost");
+      Bunny.Endpoints.Should().HaveCount(1).And.Contain(e => e == "localhost");
     }
   }
 }
