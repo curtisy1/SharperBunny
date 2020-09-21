@@ -38,9 +38,34 @@ namespace SharperBunny.Consume {
 
       this.disposedValue = true;
     }
-    
+
     protected virtual TMsg InternalDeserialize(ReadOnlyMemory<byte> message) {
       return JsonSerializer.Deserialize<TMsg>(Encoding.UTF8.GetString(message.Span));
+    }
+
+    public IConsumerBase AsAutoAck(bool autoAck = true) {
+      this.autoAck = autoAck;
+      return this;
+    }
+
+    public IConsumerBase AddTag(string tag, object value) {
+      if (this.arguments.ContainsKey(tag)) {
+        this.arguments[tag] = value;
+      } else {
+        this.arguments.Add(tag, value);
+      }
+
+      return this;
+    }
+
+    public IConsumerBase UseUniqueChannel(bool useUnique = true) {
+      this.useUniqueChannel = useUnique;
+      return this;
+    }
+
+    public IConsumerBase Prefetch(ushort prefetchCount = 50) {
+      this.prefetchCount = prefetchCount;
+      return this;
     }
   }
 }
