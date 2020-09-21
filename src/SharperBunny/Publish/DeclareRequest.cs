@@ -4,7 +4,6 @@ namespace SharperBunny.Publish {
   using RabbitMQ.Client.Events;
   using SharperBunny.Configuration;
   using SharperBunny.Connection;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class DeclareRequest<TRequest, TResponse> : IRequest<TRequest, TResponse>

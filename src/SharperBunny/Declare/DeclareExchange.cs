@@ -3,7 +3,6 @@ namespace SharperBunny.Declare {
   using System.Collections.Generic;
   using RabbitMQ.Client;
   using SharperBunny.Exceptions;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class DeclareExchange : DeclareBase, IExchange {

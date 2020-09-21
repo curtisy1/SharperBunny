@@ -4,7 +4,6 @@ namespace SharperBunny.Declare {
   using System.Linq;
   using RabbitMQ.Client;
   using SharperBunny.Exceptions;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class DeclareQueue : DeclareBase, IQueue {
@@ -59,6 +58,62 @@ namespace SharperBunny.Declare {
 
       this.BindingKey = (exchangeName, routingKey);
       return this;
+    }
+    
+    /// <summary>
+    ///   Republish Messages to this Exchange if the are either expired, or not requeued on BasicReject/BasicNack.
+    /// </summary>
+    public IQueue DeadLetterExchange(string deadLetterExchange) {
+      return this.AddTag("x-dead-letter-exchange", deadLetterExchange);
+    }
+
+    /// <summary>
+    ///   If send to the DeadLetter Exchange, use this routing-key instead of the original.
+    /// </summary>
+    public IQueue DeadLetterRoutingKey(string routingKey) {
+      return this.AddTag("x-dead-letter-routing-key", routingKey);
+    }
+
+    /// <summary>
+    ///   Set a time when the Queue will expire if no action is taken on the queue
+    /// </summary>
+    public IQueue QueueExpiry(int expiry) {
+      return this.AddTag("x-expires", expiry);
+    }
+
+    /// <summary>
+    ///   Set max length of Messages on the Queue
+    /// </summary>
+    public IQueue MaxLength(int length) {
+      return this.AddTag("x-max-length", length);
+    }
+
+    /// <summary>
+    ///   Set max bytes on this Queue.
+    /// </summary>
+    public IQueue MaxLengthBytes(int lengthBytes) {
+      return this.AddTag("x-max-length-bytes", lengthBytes);
+    }
+
+    /// <summary>
+    ///   Define this Queue as Lazy. Writes all messages automatically to Disk.
+    /// </summary>
+    public IQueue AsLazy() {
+      return this.AddTag("x-queue-mode", "lazy");
+    }
+
+    /// <summary>
+    ///   Define all incoming messages to this queue with a Time to live (Message expiry)
+    /// </summary>
+    public IQueue WithTtl(uint ttl) {
+      return this.AddTag("x-message-ttl", ttl);
+    }
+
+    /// <summary>
+    ///   only takes effect if MaxLength/MaxLengthBytes is set and is overflown
+    /// </summary>
+    public IQueue OverflowReject() {
+      return this.AddTag("x-overflow", "reject-publish");
     }
 
     private void Bind(IModel channel) {

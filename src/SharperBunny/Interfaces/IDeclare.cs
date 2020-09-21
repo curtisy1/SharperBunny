@@ -21,5 +21,19 @@ namespace SharperBunny.Interfaces {
     ///   Execute the Declaration
     /// </summary>
     void Declare();
+
+    public IQueue Queue(string name);
+
+    public bool PurgeQueue(string name);
+
+    public bool DeleteQueue(string queue, bool force = false);
+
+    public bool QueueExists(string queue);
+
+    public IExchange Exchange(string exchangeName, string type = "direct");
+
+    public bool DeleteExchange(string exchangeName, bool force = false);
+
+    public bool ExchangeExists(string exchangeName);
   }
 }

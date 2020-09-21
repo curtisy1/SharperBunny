@@ -7,7 +7,6 @@ namespace SharperBunny.Tests.IntegrationTests {
   using DockerizedTesting.RabbitMQ;
   using Microsoft.Extensions.Hosting;
   using Microsoft.Extensions.Logging;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class BunnyWorker : BackgroundService {

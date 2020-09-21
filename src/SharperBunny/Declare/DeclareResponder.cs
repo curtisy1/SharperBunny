@@ -3,7 +3,6 @@ namespace SharperBunny.Declare {
   using SharperBunny.Configuration;
   using SharperBunny.Connection;
   using SharperBunny.Exceptions;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class DeclareResponder<TRequest, TResponse> : IRespond<TRequest, TResponse>

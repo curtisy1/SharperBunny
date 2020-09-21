@@ -6,7 +6,6 @@ namespace SharperBunny.Publish {
   using SharperBunny.Configuration;
   using SharperBunny.Connection;
   using SharperBunny.Exceptions;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
   public class DeclarePublisher<T> : IPublish<T>
