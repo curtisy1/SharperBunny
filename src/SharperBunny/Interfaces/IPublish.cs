@@ -12,11 +12,11 @@ namespace SharperBunny.Interfaces {
     ///   Ensures Publisher confirms. Specify onAck and onNack what you want to do in those events
     ///   , Must be not null.
     /// </summary>
-    IPublish<T> WithConfirm(Func<BasicAckEventArgs, Task> onAck, Func<BasicNackEventArgs, Task> onNack);
+    IPublish<T> WithConfirm(Action<BasicAckEventArgs> onAck, Action<BasicNackEventArgs> onNack);
 
     /// <summary>
     /// </summary>
-    IPublish<T> AsMandatory(Func<BasicReturnEventArgs, Task> onReturn);
+    IPublish<T> AsMandatory(Action<BasicReturnEventArgs> onReturn);
 
     /// <summary>
     ///   Sets deliveryMode equal to 2

@@ -12,6 +12,7 @@ namespace SharperBunny {
   using SharperBunny.Facade;
   using SharperBunny.Interfaces;
   using SharperBunny.Publish;
+  using SharperBunny.RPC;
 
   public static class Bunny {
     internal static readonly IList<string> Endpoints = new List<string>();
@@ -87,18 +88,18 @@ namespace SharperBunny {
       where TResponse : class {
       routingKey ??= SerializeTypeName<TRequest>();
 
-      return new DeclareRequest<TRequest, TResponse>(bunny, rpcExchange, routingKey);
+      return new RpcRequest<TRequest, TResponse>(bunny, rpcExchange, routingKey);
     }
 
     /// <summary>
     ///   Other side of the Rpc Call. Consumes fromQueue. If not Specified does consume from AssemblyName.TypeName
     /// </summary>
-    public static IRespond<TRequest, TResponse> Respond<TRequest, TResponse>(this IBunny bunny, string rpcExchange, Func<TRequest, TResponse> respond, string fromQueue = null)
+    public static IRespond<TResponse> Respond<TRequest, TResponse>(this IBunny bunny, string rpcExchange, Func<TRequest, TResponse> respond, string fromQueue = null)
       where TRequest : class
       where TResponse : class {
       fromQueue ??= SerializeTypeName<TRequest>();
 
-      return new DeclareResponder<TRequest, TResponse>(bunny, rpcExchange, fromQueue, respond);
+      return new RpcResponder<TRequest, TResponse>(bunny, rpcExchange, fromQueue, respond);
     }
 
     /// <summary>

@@ -1,12 +1,11 @@
 namespace SharperBunny.Consume {
   using System;
   using System.Collections.Generic;
-  using System.Text;
-  using System.Text.Json;
   using SharperBunny.Connection;
   using SharperBunny.Interfaces;
+  using SharperBunny.Serializer;
 
-  public class ConsumerBase<TMsg> : IConsumerBase, IDisposable {
+  public class ConsumerBase<TMsg> : Serializable<TMsg>, IConsumerBase, IDisposable {
     protected readonly Dictionary<string, object> arguments = new Dictionary<string, object>();
     protected readonly IBunny bunny;
     protected readonly PermanentChannel thisChannel;
@@ -21,10 +20,6 @@ namespace SharperBunny.Consume {
       this.bunny = bunny;
       this.consumeFromQueue = fromQueue;
       this.thisChannel = new PermanentChannel(bunny);
-    }
-
-    protected virtual TMsg InternalDeserialize(ReadOnlyMemory<byte> message) {
-      return JsonSerializer.Deserialize<TMsg>(Encoding.UTF8.GetString(message.Span));
     }
 
     public IConsumerBase AsAutoAck(bool autoAck = true) {
