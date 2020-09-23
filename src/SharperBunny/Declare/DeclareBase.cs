@@ -47,9 +47,7 @@ namespace SharperBunny.Declare {
 
     public bool ExchangeExists(string exchangeName) => this.Bunny.ExchangeExists(exchangeName);
 
-    public virtual void Declare() {
-      throw DeclarationException.BaseNotValid();
-    }
+    public virtual void Declare() => throw DeclarationException.BaseNotValid();
 
     private bool ExecuteOnChannel(IBunny bunny, Action<IModel> execute) {
       IModel channel = null;

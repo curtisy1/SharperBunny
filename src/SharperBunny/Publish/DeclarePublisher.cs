@@ -9,6 +9,9 @@ namespace SharperBunny.Publish {
 
   public class DeclarePublisher<T> : Serializable<T>, IPublish<T>
     where T : class {
+    private const string contentEncoding = "utf-8";
+    private const string contentType = "application/json";
+    
     private readonly IBunny bunny;
     private readonly string publishTo;
     private readonly PermanentChannel thisChannel;
@@ -142,9 +145,7 @@ namespace SharperBunny.Publish {
       return this;
     }
 
-    public void Dispose() {
-      this.Dispose(true);
-    }
+    public void Dispose() => this.Dispose(true);
 
     private void Handlers(IModel channel, bool dismantle = false) {
       if (this.Mandatory) {
@@ -168,17 +169,11 @@ namespace SharperBunny.Publish {
       }
     }
 
-    private void HandleReturn(object sender, BasicReturnEventArgs eventArgs) {
-      this.returnCallback(eventArgs);
-    }
+    private void HandleReturn(object sender, BasicReturnEventArgs eventArgs) => this.returnCallback(eventArgs);
 
-    private void HandleAck(object sender, BasicAckEventArgs eventArgs) {
-      this.ackCallback(eventArgs);
-    }
+    private void HandleAck(object sender, BasicAckEventArgs eventArgs) => this.ackCallback(eventArgs);
 
-    private void HandleNack(object sender, BasicNackEventArgs eventArgs) {
-      this.nackCallback(eventArgs);
-    }
+    private void HandleNack(object sender, BasicNackEventArgs eventArgs) => this.nackCallback(eventArgs);
 
     public static IBasicProperties ConstructProperties(IBasicProperties basicProperties, bool persistent, int? expires) {
       basicProperties.Persistent = persistent;
@@ -189,8 +184,8 @@ namespace SharperBunny.Publish {
       }
 
       basicProperties.CorrelationId = Guid.NewGuid().ToString();
-      basicProperties.ContentType = ContentType;
-      basicProperties.ContentEncoding = ContentEncoding;
+      basicProperties.ContentType = contentType;
+      basicProperties.ContentEncoding = contentEncoding;
 
       return basicProperties;
     }

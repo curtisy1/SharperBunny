@@ -26,13 +26,9 @@ namespace SharperBunny.Connection {
       }
     }
 
-    public void Dispose() {
-      this.Dispose(true);
-    }
+    public void Dispose() => this.Dispose(true);
 
-    public void StartConfirmMode() {
-      this.Channel.ConfirmSelect();
-    }
+    public void StartConfirmMode() => this.Channel.ConfirmSelect();
 
     protected virtual void Dispose(bool disposing) {
       if (this.disposedValue) {

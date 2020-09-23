@@ -43,42 +43,29 @@ namespace SharperBunny {
     /// <summary>
     ///   Connect with fluent interface
     /// </summary>
-    public static IConnectionPipe ConnectSingleWith() {
-      return new ConnectionPipe();
-    }
+    public static IConnectionPipe ConnectSingleWith() => new ConnectionPipe();
 
     /// <summary>
     ///   Connect to a cluster with a builder interface
     /// </summary>
-    public static IConnectionCluster ClusterConnect() {
-      return new ConnectionCluster();
-    }
-    
+    public static IConnectionCluster ClusterConnect() => new ConnectionCluster();
+
     /// <summary>
     ///   Create a Publisher Builder interface. Can Also be used to publish messages.
     /// </summary>
     public static IPublish<TMsg> Publisher<TMsg>(this IBunny bunny, string publishToExchange)
-      where TMsg : class {
-      return new DeclarePublisher<TMsg>(bunny, publishToExchange);
-    }
+      where TMsg : class =>
+      new DeclarePublisher<TMsg>(bunny, publishToExchange);
 
     /// <summary>
     ///   Create a Consumer to subscribe to a Queue. If no queue is specified the Queue Name will be AssemblyName.TypeName
     /// </summary>
-    public static IConsumer<TMsg> Consumer<TMsg>(this IBunny bunny, string fromQueue = null) {
-      fromQueue ??= SerializeTypeName<TMsg>();
-
-      return new Consumer<TMsg>(bunny, fromQueue);
-    }
+    public static IConsumer<TMsg> Consumer<TMsg>(this IBunny bunny, string fromQueue = null) => new Consumer<TMsg>(bunny, fromQueue ?? SerializeTypeName<TMsg>());
 
     /// <summary>
     ///   Create a AsyncConsumer to subscribe to a Queue. If no queue is specified the Queue Name will be AssemblyName.TypeName
     /// </summary>
-    public static IAsyncConsumer<TMsg> AsyncConsumer<TMsg>(this IBunny bunny, string fromQueue = null) {
-      fromQueue ??= SerializeTypeName<TMsg>();
-
-      return new AsyncConsumer<TMsg>(bunny, fromQueue);
-    }
+    public static IAsyncConsumer<TMsg> AsyncConsumer<TMsg>(this IBunny bunny, string fromQueue = null) => new AsyncConsumer<TMsg>(bunny, fromQueue ?? SerializeTypeName<TMsg>());
 
     /// <summary>
     ///   Create a Requester to send Rpc Requests. If no routingKey is specified the routingKey will be AssemblyName.TypeName
@@ -105,13 +92,9 @@ namespace SharperBunny {
     /// <summary>
     ///   Enter Queue DeclarationMode
     /// </summary>
-    public static IQueue Queue(this IBunny bunny, string name) {
-      return new DeclareQueue(bunny, name);
-    }
-    
-    public static IExchange Exchange(this IBunny bunny, string exchangeName, string type = "direct") {
-      return new DeclareExchange(bunny, exchangeName, type);
-    }
+    public static IQueue Queue(this IBunny bunny, string name) => new DeclareQueue(bunny, name);
+
+    public static IExchange Exchange(this IBunny bunny, string exchangeName, string type = "direct") => new DeclareExchange(bunny, exchangeName, type);
 
     internal static IBunny Connect() {
       var factory = new ConnectionFactory {
@@ -119,7 +102,7 @@ namespace SharperBunny {
         Uri = new Uri(Endpoints.FirstOrDefault() ?? "amqp://guest:guest@localhost:5672"),
       };
       var count = 0;
-      
+
       while (count <= RetryCount) {
         try {
           return new MultiBunny(factory);
@@ -164,16 +147,10 @@ namespace SharperBunny {
       }
     }
 
-    internal static PermanentChannel ToPermanentChannel(this IBunny bunny) {
-      return new PermanentChannel(bunny);
-    }
+    internal static PermanentChannel ToPermanentChannel(this IBunny bunny) => new PermanentChannel(bunny);
 
-    private static string SerializeTypeName<T>() {
-      return SerializeTypeName(typeof(T));
-    }
+    private static string SerializeTypeName<T>() => SerializeTypeName(typeof(T));
 
-    private static string SerializeTypeName(Type t) {
-      return $"{t.Assembly.GetName().Name}.{t.Name}";
-    }
+    private static string SerializeTypeName(Type t) => $"{t.Assembly.GetName().Name}.{t.Name}";
   }
 }

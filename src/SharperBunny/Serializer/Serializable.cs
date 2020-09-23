@@ -3,15 +3,8 @@ namespace SharperBunny.Serializer {
   using System.Text.Json;
 
   public class Serializable<TResponse> {
-    public static string ContentEncoding => "utf-8";
-    public static string ContentType => "application/json";
+    protected virtual byte[] InternalSerialize<TRequest>(TRequest msg) => JsonSerializer.SerializeToUtf8Bytes(msg);
 
-    protected virtual byte[] InternalSerialize<TRequest>(TRequest msg) {
-      return JsonSerializer.SerializeToUtf8Bytes(msg);
-    }
-
-    protected virtual TResponse InternalDeserialize(ReadOnlyMemory<byte> arg) {
-      return JsonSerializer.Deserialize<TResponse>(arg.Span);
-    }
+    protected virtual TResponse InternalDeserialize(ReadOnlyMemory<byte> arg) => JsonSerializer.Deserialize<TResponse>(arg.Span);
   }
 }

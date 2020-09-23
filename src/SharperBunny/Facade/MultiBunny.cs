@@ -16,7 +16,6 @@ namespace SharperBunny.Facade {
 
     public MultiBunny(IConnectionFactory factory) {
       this.factory = factory;
-
       this.connection = factory.CreateConnection();
     }
 
@@ -42,9 +41,7 @@ namespace SharperBunny.Facade {
       }
     }
 
-    public void Dispose() {
-      this.Dispose(true);
-    }
+    public void Dispose() => this.Dispose(true);
 
     private void SetConnected() {
       if (!this.connection.IsOpen) {

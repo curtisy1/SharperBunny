@@ -17,8 +17,7 @@ namespace SharperBunny.Connection {
       set => this.vHost = value;
     }
 
-    public string ToString(string format, IFormatProvider formatProvider) {
-      return $"amqp://{this.User}:{this.Password}@{this.Host}:{this.Port}/{this.VirtualHost}";
-    }
+    public string ToString(string format, IFormatProvider formatProvider)
+      => $"amqp://{this.User}:{this.Password}@{this.Host}:{this.Port}/{this.VirtualHost}";
   }
 }

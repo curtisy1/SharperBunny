@@ -1,11 +1,10 @@
 namespace SharperBunny.Consume {
-  using System;
   using System.Collections.Generic;
   using SharperBunny.Connection;
   using SharperBunny.Interfaces;
   using SharperBunny.Serializer;
 
-  public class ConsumerBase<TMsg> : Serializable<TMsg>, IConsumerBase, IDisposable {
+  public class ConsumerBase<TMsg> : Serializable<TMsg>, IConsumerBase {
     protected readonly Dictionary<string, object> arguments = new Dictionary<string, object>();
     protected readonly IBunny bunny;
     protected readonly PermanentChannel thisChannel;
@@ -47,9 +46,7 @@ namespace SharperBunny.Consume {
       return this;
     }
 
-    public void Dispose() {
-      this.Dispose(true);
-    }
+    public void Dispose() => this.Dispose(true);
 
     protected virtual void Dispose(bool disposing) {
       if (this.disposedValue) {

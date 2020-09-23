@@ -69,9 +69,7 @@ namespace SharperBunny.RPC {
       return this;
     }
 
-    public void Dispose() {
-      this.Dispose(true);
-    }
+    public void Dispose() => this.Dispose(true);
 
     private OperationResult<TResponse> Publish(IModel channel, string replyTo, byte[] payload, OperationResult<TResponse> result, string correlationId) {
       var props = channel.CreateBasicProperties();
