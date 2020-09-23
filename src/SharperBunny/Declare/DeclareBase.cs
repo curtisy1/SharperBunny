@@ -1,4 +1,6 @@
 namespace SharperBunny.Declare {
+  using System;
+  using RabbitMQ.Client;
   using SharperBunny.Exceptions;
   using SharperBunny.Interfaces;
 
@@ -33,8 +35,31 @@ namespace SharperBunny.Declare {
       return this;
     }
 
-    public virtual void Declare() {
-      throw DeclarationException.BaseNotValid();
+    public bool PurgeQueue(string name) => this.ExecuteOnChannel(this.Bunny, model => model.QueuePurge(name));
+
+    public bool DeleteQueue(string queue, bool force = false)
+      => this.ExecuteOnChannel(this.Bunny, model => model.QueueDelete(queue, !force, !force));
+
+    public bool QueueExists(string queue) => this.Bunny.QueueExists(queue);
+
+    public bool DeleteExchange(string exchangeName, bool force = false)
+      => this.ExecuteOnChannel(this.Bunny, model => model.ExchangeDelete(exchangeName, !force));
+
+    public bool ExchangeExists(string exchangeName) => this.Bunny.ExchangeExists(exchangeName);
+
+    public virtual void Declare() => throw DeclarationException.BaseNotValid();
+
+    private bool ExecuteOnChannel(IBunny bunny, Action<IModel> execute) {
+      IModel channel = null;
+      try {
+        channel = bunny.Channel(true);
+        execute(channel);
+        return true;
+      } catch {
+        return false;
+      } finally {
+        channel?.Close();
+      }
     }
   }
 }

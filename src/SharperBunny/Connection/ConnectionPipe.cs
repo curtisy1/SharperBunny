@@ -66,9 +66,7 @@ namespace SharperBunny.Connection {
       return this;
     }
 
-    public string ToString(string format, IFormatProvider formatProvider) {
-      var result = $"amqp://{this.user}:{this.password}@{this.host}:{this.port}/{this.vHost}";
-      return result;
-    }
+    public string ToString(string format, IFormatProvider formatProvider)
+      => $"amqp://{this.user}:{this.password}@{this.host}:{this.port}/{this.vHost}";
   }
 }

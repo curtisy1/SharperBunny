@@ -10,7 +10,8 @@ namespace SharperBunny.Consume {
     private Action<ICarrot<TMsg>> nackBehaviour;
     private Action<ICarrot<TMsg>> receive;
 
-    public Consumer(IBunny bunny, string fromQueue) : base(bunny, fromQueue) {
+    public Consumer(IBunny bunny, string fromQueue)
+      : base(bunny, fromQueue) {
       this.deserialize = this.InternalDeserialize;
       this.receive = carrot => carrot.SendAck();
       this.ackBehaviour = carrot => carrot.SendAck();
@@ -79,9 +80,7 @@ namespace SharperBunny.Consume {
       return this;
     }
 
-    public void Cancel() {
-      this.Dispose(true);
-    }
+    public void Cancel() =>this.Dispose(true);
 
     private void HandleReceived(object channel, BasicDeliverEventArgs args) {
       Carrot<TMsg> carrot = null;

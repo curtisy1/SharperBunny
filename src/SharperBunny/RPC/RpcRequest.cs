@@ -1,37 +1,23 @@
-namespace SharperBunny.Publish {
+namespace SharperBunny.RPC {
   using System;
   using RabbitMQ.Client;
   using RabbitMQ.Client.Events;
-  using SharperBunny.Configuration;
-  using SharperBunny.Connection;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
+  using SharperBunny.Publish;
 
-  public class DeclareRequest<TRequest, TResponse> : IRequest<TRequest, TResponse>
+  public class RpcRequest<TRequest, TResponse> : RpcBase<TRequest, TResponse>, IRequest<TRequest, TResponse>
     where TRequest : class
     where TResponse : class {
-    private const string directReplyTo = "amq.rabbitmq.reply-to";
-
-    private readonly IBunny bunny;
     private readonly string routingKey;
-    private readonly PermanentChannel thisChannel;
     private readonly string toExchange;
-    private Func<ReadOnlyMemory<byte>, TResponse> deserialize;
-    private bool disposedValue;
     private IQueue queueDeclare;
-    private Func<TRequest, byte[]> serialize;
 
     private int timeOut = 1500;
-    private bool useTempQueue;
-    private bool useUniqueChannel;
 
-    internal DeclareRequest(IBunny bunny, string toExchange, string routingKey) {
-      this.bunny = bunny;
+    internal RpcRequest(IBunny bunny, string toExchange, string routingKey)
+      : base(bunny) {
       this.toExchange = toExchange;
       this.routingKey = routingKey;
-      this.serialize = Config.Serialize;
-      this.deserialize = Config.Deserialize<TResponse>;
-      this.thisChannel = new PermanentChannel(this.bunny);
     }
 
     private string RoutingKey => this.queueDeclare != null ? this.queueDeclare.RoutingKey : this.routingKey;
@@ -70,15 +56,10 @@ namespace SharperBunny.Publish {
       return this;
     }
 
-    public IRequest<TRequest, TResponse> WithTemporaryQueue(bool useTempQueue = true) {
-      this.useTempQueue = useTempQueue;
-      return this;
-    }
-
     public IRequest<TRequest, TResponse> WithQueueDeclare(string queue = null, string exchange = null, string routingKey = null) {
       var name = queue ?? typeof(TRequest).FullName;
       var rKey = routingKey ?? typeof(TRequest).FullName;
-      this.queueDeclare = (IQueue)this.bunny.Setup().Queue(name).Bind(exchange ?? this.toExchange, rKey).SetDurable();
+      this.queueDeclare = (IQueue)this.bunny.Queue(name).Bind(exchange ?? this.toExchange, rKey).SetDurable();
 
       return this;
     }
@@ -88,24 +69,7 @@ namespace SharperBunny.Publish {
       return this;
     }
 
-    public IRequest<TRequest, TResponse> SerializeRequest(Func<TRequest, byte[]> serialize) {
-      this.serialize = serialize;
-      return this;
-    }
-
-    public IRequest<TRequest, TResponse> DeserializeResponse(Func<ReadOnlyMemory<byte>, TResponse> deserialize) {
-      this.deserialize = deserialize;
-      return this;
-    }
-
-    public IRequest<TRequest, TResponse> UseUniqueChannel(bool useUnique = true) {
-      this.useUniqueChannel = useUnique;
-      return this;
-    }
-
-    public void Dispose() {
-      this.Dispose(true);
-    }
+    public void Dispose() => this.Dispose(true);
 
     private OperationResult<TResponse> Publish(IModel channel, string replyTo, byte[] payload, OperationResult<TResponse> result, string correlationId) {
       var props = channel.CreateBasicProperties();

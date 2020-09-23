@@ -1,5 +1,7 @@
 namespace SharperBunny.Interfaces {
-  public interface IConsumerBase {
+  using System;
+
+  public interface IConsumerBase : IDisposable {
     public IConsumerBase AsAutoAck(bool autoAck = true);
 
     public IConsumerBase AddTag(string tag, object value);

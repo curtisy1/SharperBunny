@@ -55,15 +55,15 @@ With a bunny (representing a single connection, that does encapsulate Connection
 you can access the Declarations to create your RabbitMQ Entities:
 
 ```csharp
-IQueue queue = bunny.Setup().Queue();
-IExchange exchange = bunny.Setup().Exchange();
+IQueue queue = bunny.Queue();
+IExchange exchange = bunny.Exchange();
 ```
 Those are Builder interfaces and allow to specify all properties that those Entities have in place.
 
 You can also remove some of those entities or check if they exist
 ```csharp
-bool deleted = await bunny.Setup().DeleteQueueAsync("queue-name");
-bool exists = await bunny.Setup().QueueExistsAsync("queue-name");
+bool deleted = bunny.Setup().DeleteQueue("queue-name");
+bool exists = bunny.Setup().QueueExists("queue-name");
 ```
 
 If you still need to access the underlying Channel (IModel of the RabbitMQ.Client):
@@ -88,13 +88,13 @@ IConnection connection = bunny.Connection;
 
  // declares a queue dependent
  // on the Message Type bound to the amq.direct exchange
- OperationResult<TestMessage> result = await publisher.WithQueueDeclare()
+ OperationResult<TestMessage> result = publisher.WithQueueDeclare()
                                                       .AsMandatory() // make sure the message is routed
                                                       .AsPersistent() // deliveryMode=2
-                                                      .SendAsync(new TestMessage());
+                                                      .Send(new TestMessage());
  Console.WriteLine(result.IsSuccess);
  // remove the Queue again
- bool success = await bunny.Setup().DeleteQueueAsync(typeof(TestMessage).FullName, force: true);
+ bool success = bunny.Setup().DeleteQueue(typeof(TestMessage).FullName, force: true);
 
  bunny.Dispose();
 ```
@@ -103,17 +103,16 @@ The publisher can be used to publish several messages. With AsUniqueChannel you 
 ### Declare a simple Queue bound to the amq.direct exchange
 ```csharp
  IBunny bunny = Bunny.ConnectSingle("amqp://guest:guest@localhost/%2F");
- IQueue declare = bunny.Setup()
-                    .Queue("bind-test")
+ IQueue declare = bunny.Queue("bind-test")
                     .Bind("amq.direct", "bind-test-key")
-                    .AsDurable()
+                    .SetDurable()
                     .QueueExpiry(1500)
                     .WithTTL(500)
                     .MaxLength(10);
 
- await declare.DeclareAsync();
+ declare.Declare();
 ```
-The IQueue result can be supplied to other builder interfaces. It represents the declared Queue. After the DeclareAsync, the Queue Properties cannot be changed anymore.
+The IQueue result can be supplied to other builder interfaces. It represents the declared Queue. After the Declare, the Queue Properties cannot be changed anymore.
 
 
 Enjoy distributing your application

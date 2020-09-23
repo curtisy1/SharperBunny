@@ -1,38 +1,22 @@
-namespace SharperBunny.Declare {
+namespace SharperBunny.RPC {
   using System;
-  using SharperBunny.Configuration;
-  using SharperBunny.Connection;
   using SharperBunny.Exceptions;
-  using SharperBunny.Extensions;
   using SharperBunny.Interfaces;
 
-  public class DeclareResponder<TRequest, TResponse> : IRespond<TRequest, TResponse>
+  public class RpcResponder<TRequest, TResponse> : RpcBase<TResponse, TRequest>, IRespond<TResponse>
     where TRequest : class
     where TResponse : class {
-    public const string directReplyTo = "amq.rabbitmq.reply-to";
     private const string defaultExchange = "";
 
-    private readonly IBunny bunny;
     private readonly string consumeFromQueue;
     private readonly Func<TRequest, TResponse> respond;
     private readonly string rpcExchange;
-    private readonly PermanentChannel thisChannel;
-    private Func<ReadOnlyMemory<byte>, TRequest> deserialize;
 
-    private bool disposedValue;
-    private Func<TResponse, byte[]> serialize;
-
-    private bool useTempQueue;
-    private bool useUniqueChannel;
-
-    public DeclareResponder(IBunny bunny, string rpcExchange, string fromQueue, Func<TRequest, TResponse> respond) {
-      this.bunny = bunny;
+    public RpcResponder(IBunny bunny, string rpcExchange, string fromQueue, Func<TRequest, TResponse> respond)
+    : base(bunny) {
       this.respond = respond ?? throw DeclarationException.Argument(new ArgumentException("respond delegate must not be null"));
       this.rpcExchange = rpcExchange;
-      this.serialize = Config.Serialize;
       this.consumeFromQueue = fromQueue;
-      this.thisChannel = new PermanentChannel(bunny);
-      this.deserialize = Config.Deserialize<TRequest>;
     }
 
     public OperationResult<TResponse> StartResponding() {
@@ -58,8 +42,7 @@ namespace SharperBunny.Declare {
       }
 
       // consume
-      var forceDeclare = this.bunny.Setup()
-        .Queue(this.consumeFromQueue)
+      var forceDeclare = this.bunny.Queue(this.consumeFromQueue)
         .Bind(this.rpcExchange, this.consumeFromQueue)
         .SetDurable();
 
@@ -80,24 +63,7 @@ namespace SharperBunny.Declare {
       return result;
     }
 
-    public IRespond<TRequest, TResponse> WithSerialize(Func<TResponse, byte[]> serialize) {
-      this.serialize = serialize;
-      return this;
-    }
-
-    public IRespond<TRequest, TResponse> WithDeserialize(Func<ReadOnlyMemory<byte>, TRequest> deserialize) {
-      this.deserialize = deserialize;
-      return this;
-    }
-
-    public IRespond<TRequest, TResponse> WithUniqueChannel(bool useUniqueChannel = true) {
-      this.useUniqueChannel = useUniqueChannel;
-      return this;
-    }
-
-    public void Dispose() {
-      this.Dispose(true);
-    }
+    public void Dispose() => this.Dispose(true);
 
     protected virtual void Dispose(bool disposing) {
       if (this.disposedValue) {

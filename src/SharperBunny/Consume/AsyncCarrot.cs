@@ -4,7 +4,8 @@ namespace SharperBunny.Consume {
   using SharperBunny.Interfaces;
 
   public class AsyncCarrot<TMsg> : CarrotBase<TMsg>, IAsyncCarrot<TMsg> {
-    public AsyncCarrot(TMsg message, ulong deliveryTag, IPermanentChannel thisChannel) : base(message, deliveryTag, thisChannel) { }
+    public AsyncCarrot(TMsg message, ulong deliveryTag, IPermanentChannel thisChannel)
+      : base(message, deliveryTag, thisChannel) { }
 
     public Task<OperationResult<TMsg>> SendAck(bool multiple = false) {
       var result = new OperationResult<TMsg>();
