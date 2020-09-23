@@ -15,7 +15,7 @@ namespace SharperBunny.RPC {
     private int timeOut = 1500;
 
     internal RpcRequest(IBunny bunny, string toExchange, string routingKey)
-    : base(bunny) {
+      : base(bunny) {
       this.toExchange = toExchange;
       this.routingKey = routingKey;
     }
@@ -59,7 +59,7 @@ namespace SharperBunny.RPC {
     public IRequest<TRequest, TResponse> WithQueueDeclare(string queue = null, string exchange = null, string routingKey = null) {
       var name = queue ?? typeof(TRequest).FullName;
       var rKey = routingKey ?? typeof(TRequest).FullName;
-      this.queueDeclare = (IQueue)this.bunny.Setup().Queue(name).Bind(exchange ?? this.toExchange, rKey).SetDurable();
+      this.queueDeclare = (IQueue)this.bunny.Queue(name).Bind(exchange ?? this.toExchange, rKey).SetDurable();
 
       return this;
     }

@@ -42,8 +42,7 @@ namespace SharperBunny.RPC {
       }
 
       // consume
-      var forceDeclare = this.bunny.Setup()
-        .Queue(this.consumeFromQueue)
+      var forceDeclare = this.bunny.Queue(this.consumeFromQueue)
         .Bind(this.rpcExchange, this.consumeFromQueue)
         .SetDurable();
 

@@ -58,8 +58,7 @@ namespace SharperBunny.Publish {
         this.queueDeclare?.Declare();
 
         if (force) {
-          this.bunny.Setup()
-            .Exchange(this.publishTo)
+          this.bunny.Exchange(this.publishTo)
             .SetDurable()
             .Declare();
         }
@@ -134,7 +133,7 @@ namespace SharperBunny.Publish {
     public IPublish<T> WithQueueDeclare(string queueName = null, string routingKey = null, string exchangeName = "amq.direct") {
       var name = queueName ?? typeof(T).FullName;
       var rKey = routingKey ?? typeof(T).FullName;
-      this.queueDeclare = (IQueue)this.bunny.Setup().Queue(name).Bind(exchangeName, rKey).SetDurable();
+      this.queueDeclare = (IQueue)this.bunny.Queue(name).Bind(exchangeName, rKey).SetDurable();
       return this;
     }
 

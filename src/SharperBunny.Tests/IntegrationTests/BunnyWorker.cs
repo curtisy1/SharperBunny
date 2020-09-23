@@ -38,21 +38,20 @@ namespace SharperBunny.Tests.IntegrationTests {
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken) {
-      this.logger.LogInformation("Setting up Queue");
-
-      var queue = this.bunny.Setup()
-        .Queue("TestingQueue");
-      
       this.logger.LogInformation("Setting up exchange");
-
-      this.bunny.Setup()
-        .Exchange("TestingExchange")
+      this.bunny
+        .Exchange("TestingExchange", "fanout")
+        .SetDurable(false)
+        .SetAutoDelete()
         .Declare();
-      
-      this.logger.LogInformation("Connecting exchange and queue");
 
-      queue.Bind("TestingExchange", string.Empty);
-      queue.Declare();
+      this.logger.LogInformation("Setting up Queue");
+      this.bunny
+        .Queue("TestingQueue")
+        .Bind("TestingExchange", string.Empty)
+        .SetDurable()
+        .SetAutoDelete()
+        .Declare();
 
       var consumer = this.bunny.Consumer<TestMessage>("TestingQueue")
         .Callback(this.LogReceivedMessage)

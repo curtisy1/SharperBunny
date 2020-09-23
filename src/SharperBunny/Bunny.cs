@@ -103,10 +103,14 @@ namespace SharperBunny {
     }
 
     /// <summary>
-    ///   Interface for building Queues, Exchanges, Bindings and so on
+    ///   Enter Queue DeclarationMode
     /// </summary>
-    public static IDeclare Setup(this IBunny bunny) {
-      return new DeclareBase(bunny);
+    public static IQueue Queue(this IBunny bunny, string name) {
+      return new DeclareQueue(bunny, name);
+    }
+    
+    public static IExchange Exchange(this IBunny bunny, string exchangeName, string type = "direct") {
+      return new DeclareExchange(bunny, exchangeName, type);
     }
 
     internal static IBunny Connect() {
