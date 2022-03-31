@@ -1,4 +1,5 @@
 namespace SharperBunny.Tests.Connection {
+  using System.Linq;
   using FluentAssertions;
   using RabbitMQ.Client.Exceptions;
   using SharperBunny.Connection;
@@ -13,7 +14,7 @@ namespace SharperBunny.Tests.Connection {
       
       connectionCluster.AddNode(basicAmqp);
 
-      Bunny.Endpoints.Should().HaveCount(1).And.Contain(x => x == "localhost");
+      Bunny.Endpoints.Should().HaveCount(1).And.Subject.First().Should().Contain("localhost");
       Bunny.Endpoints.Clear();
     }
 
@@ -28,7 +29,7 @@ namespace SharperBunny.Tests.Connection {
         // this is expected, we don't want to connect anyway
       }
 
-      Bunny.Endpoints.Should().HaveCount(1).And.Contain(x => x == "localhost");
+      Bunny.Endpoints.Should().HaveCount(1).And.Subject.First().Should().Contain("localhost");
       Bunny.Endpoints.Clear();
     }
   }
