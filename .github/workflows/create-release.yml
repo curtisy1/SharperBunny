@@ -29,4 +29,4 @@ jobs:
     - name: Publish
       env:
         NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
-      run: dotnet nuget push src/SharperBunny/bin/Release/**/*.nupkg --skip-duplicate -n true -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push src/SharperBunny/bin/Release/*.nupkg --skip-duplicate -n true -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
