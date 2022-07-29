@@ -36,5 +36,19 @@ namespace SharperBunny.Tests.Declaration {
       model.ReceivedWithAnyArgs(1).QueueDeclare();
       model.ReceivedWithAnyArgs(1).QueueBind(default, default, default,default);
     }
+    
+    [Fact]
+    public void Declare_OnlyDeclaresQueueOnce() {
+      var bunny = Substitute.For<IBunny>();
+      var model = Substitute.For<IModel>();
+      model.QueueDeclarePassive(default).ThrowsForAnyArgs(new OperationInterruptedException(default));
+      bunny.Channel().ReturnsForAnyArgs(model);
+      var queue = new DeclareQueue(bunny, string.Empty);
+
+      queue.Declare();
+      queue.Declare();
+
+      model.ReceivedWithAnyArgs(1).QueueDeclare();
+    }
   }
 }
