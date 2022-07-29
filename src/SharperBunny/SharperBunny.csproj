@@ -10,7 +10,7 @@
     <Description>A Fluent-API wrapper around the official RabbitMQ-Client</Description>
     <Copyright>Alexander Oberländer</Copyright>
     <PackageProjectUrl>https://github.com/curtisy1/SharperBunny</PackageProjectUrl>
-    <AssemblyVersion>1.4.0</AssemblyVersion>
+    <AssemblyVersion>1.4.1</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
