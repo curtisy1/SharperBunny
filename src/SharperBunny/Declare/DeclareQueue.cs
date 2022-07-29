@@ -26,8 +26,10 @@ namespace SharperBunny.Declare {
 
       IModel channel = null;
       try {
-        if (!this.Bunny.QueueExists(this.Name)) {
-          channel = this.Bunny.Channel(true);
+        var queueExists = this.Bunny.QueueExists(this.Name);
+        channel = this.Bunny.Channel(true);
+
+        if (!queueExists) {
           channel.QueueDeclare(this.Name, this.Durable, this.Exclusive, this.AutoDelete, this.arguments.Any() ? this.arguments : null);
         }
         
